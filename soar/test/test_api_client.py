@@ -16,6 +16,11 @@ __revision__ = '$Format:%H$'
 
 import unittest
 
+from qgis.PyQt.QtCore import (
+    Qt,
+    QDateTime
+)
+
 from .utilities import get_qgis_app
 from ..core.client import (
     Listing,
@@ -56,7 +61,7 @@ class ApiClientTest(unittest.TestCase):
                 "environment"
             ],
             "geometryWKT": "POLYGON((48.10236963 38.07218305,48.03699668 38.07218305,48.03699668 38.03425478,48.10236963 38.03425478,48.10236963 38.07218305))",
-            "updatedAt": 1666322734
+            "updatedAt": 1669153356
         }
 
         listing = Listing.from_json(json)
@@ -80,7 +85,7 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.user_name, 'TheRealDazzler')
         self.assertEqual(listing.user_id, '4515f58126704ae4831ffa9d66c395d7')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
-        # self.assertEqual(listing.created_at, '')
+        self.assertEqual(listing.created_at.toUTC(), QDateTime(2021, 9, 1, 13, 42, 51))
         self.assertEqual(listing.total_comments, 1)
         self.assertEqual(listing.filename,
                          "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi dam_8ab6c81cd0d07457796a87da86a7ae38.tiff")
@@ -89,8 +94,9 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.filehash, '8ab6c81cd0d07457796a87da86a7ae38')
         self.assertEqual(listing.total_likes, 33)
         self.assertEqual(listing.categories, ['marine', 'environment'])
-        # self.assertEqual(listing.geometry, '')
-        # self.assertEqual(listing.updated_at, '')
+        self.assertEqual(listing.geometry.asWkt(1), 'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
+        self.assertEqual(listing.updated_at.toUTC(),
+                         QDateTime(2022, 11, 22, 21, 42, 36, 0, Qt.TimeSpec(1)))
 
 
 if __name__ == "__main__":
