@@ -85,7 +85,7 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.user_name, 'TheRealDazzler')
         self.assertEqual(listing.user_id, '4515f58126704ae4831ffa9d66c395d7')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
-        self.assertEqual(listing.created_at.toUTC(), QDateTime(2021, 9, 1, 13, 42, 51))
+        self.assertEqual(listing.created_at.toUTC(), QDateTime(2021, 9, 1, 3, 42, 51, 0, Qt.TimeSpec(1)))
         self.assertEqual(listing.total_comments, 1)
         self.assertEqual(listing.filename,
                          "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi dam_8ab6c81cd0d07457796a87da86a7ae38.tiff")
