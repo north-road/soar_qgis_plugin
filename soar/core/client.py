@@ -13,6 +13,7 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
+import json
 from enum import Enum
 from typing import (
     Optional,
@@ -33,6 +34,16 @@ class ListingType(Enum):
     Image = 2
     Wms = 3
     Order = 4
+
+    @staticmethod
+    def from_string(string: Optional[str]) -> Optional['ListingType']:
+        if not string:
+            return None
+        return {'TILE_LAYER': ListingType.TileLayer,
+                'IMAGE': ListingType.Image,
+                'WMS': ListingType.Wms,
+                'ORDER': ListingType.Order
+                }[string]
 
 
 class OrderBy(Enum):
@@ -74,11 +85,47 @@ class Listing:
         self.updated_at: QDateTime = QDateTime()
 
     @staticmethod
-    def from_json(json: dict) -> 'Listing':
+    def from_json(input: dict) -> 'Listing':
         """
         Creates a listing from JSON
         """
-        return Listing()
+        res = Listing()
+        res.owner = input.get('owner')
+        metadata_json = input.get('metadata')
+        if metadata_json:
+            res.metadata = json.loads(metadata_json)
+        res.preview_url = input.get('previewUrl')
+        res.avatar_url = input.get('avatarUrl')
+        res.description = input.get('description')
+        min_zoom = input.get('minZoom')
+        if min_zoom:
+            res.min_zoom = int(min_zoom)
+        res.listing_type = ListingType.from_string(input.get('listingType'))
+        res.title = input.get('title')
+        res.user_name = input.get('userName')
+        res.user_id = input.get('userId')
+        res.tags = input.get('tags', [])
+        # todo
+        # res.created_at = None
+        total_comments = input.get('totalComments')
+        if total_comments is not None:
+            res.total_comments = int(total_comments)
+        res.filename = input.get('filename')
+        total_views = input.get('totalViews')
+        if total_views is not None:
+            res.total_views = int(total_views)
+        _id = input.get('id')
+        if _id is not None:
+            res.id = int(_id)
+        res.filehash = input.get('filehash')
+        total_likes = input.get('totalLikes')
+        if total_likes is not None:
+            res.total_likes = int(total_likes)
+        res.categories = input.get('categories', [])
+        # todo geometry
+        # todo
+        # res.created_at = None
+        return res
 
 
 class ApiClient:
