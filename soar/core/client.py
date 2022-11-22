@@ -37,6 +37,9 @@ class ListingType(Enum):
 
     @staticmethod
     def from_string(string: Optional[str]) -> Optional['ListingType']:
+        """
+        Converts a string to a ListingType
+        """
         if not string:
             return None
         return {'TILE_LAYER': ListingType.TileLayer,
@@ -85,43 +88,43 @@ class Listing:
         self.updated_at: QDateTime = QDateTime()
 
     @staticmethod
-    def from_json(input: dict) -> 'Listing':
+    def from_json(input_json: dict) -> 'Listing':
         """
         Creates a listing from JSON
         """
         res = Listing()
-        res.owner = input.get('owner')
-        metadata_json = input.get('metadata')
+        res.owner = input_json.get('owner')
+        metadata_json = input_json.get('metadata')
         if metadata_json:
             res.metadata = json.loads(metadata_json)
-        res.preview_url = input.get('previewUrl')
-        res.avatar_url = input.get('avatarUrl')
-        res.description = input.get('description')
-        min_zoom = input.get('minZoom')
+        res.preview_url = input_json.get('previewUrl')
+        res.avatar_url = input_json.get('avatarUrl')
+        res.description = input_json.get('description')
+        min_zoom = input_json.get('minZoom')
         if min_zoom:
             res.min_zoom = int(min_zoom)
-        res.listing_type = ListingType.from_string(input.get('listingType'))
-        res.title = input.get('title')
-        res.user_name = input.get('userName')
-        res.user_id = input.get('userId')
-        res.tags = input.get('tags', [])
+        res.listing_type = ListingType.from_string(input_json.get('listingType'))
+        res.title = input_json.get('title')
+        res.user_name = input_json.get('userName')
+        res.user_id = input_json.get('userId')
+        res.tags = input_json.get('tags', [])
         # todo
         # res.created_at = None
-        total_comments = input.get('totalComments')
+        total_comments = input_json.get('totalComments')
         if total_comments is not None:
             res.total_comments = int(total_comments)
-        res.filename = input.get('filename')
-        total_views = input.get('totalViews')
+        res.filename = input_json.get('filename')
+        total_views = input_json.get('totalViews')
         if total_views is not None:
             res.total_views = int(total_views)
-        _id = input.get('id')
+        _id = input_json.get('id')
         if _id is not None:
             res.id = int(_id)
-        res.filehash = input.get('filehash')
-        total_likes = input.get('totalLikes')
+        res.filehash = input_json.get('filehash')
+        total_likes = input_json.get('totalLikes')
         if total_likes is not None:
             res.total_likes = int(total_likes)
-        res.categories = input.get('categories', [])
+        res.categories = input_json.get('categories', [])
         # todo geometry
         # todo
         # res.created_at = None
@@ -153,4 +156,3 @@ class ApiClient:
         """
         Retrieves listings for a set of parameters
         """
-        pass
