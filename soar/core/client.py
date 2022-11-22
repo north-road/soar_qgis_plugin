@@ -108,8 +108,9 @@ class Listing:
         res.user_name = input_json.get('userName')
         res.user_id = input_json.get('userId')
         res.tags = input_json.get('tags', [])
-        # todo
-        # res.created_at = None
+        created_at_seconds = input_json.get('createdAt')
+        if created_at_seconds is not None:
+            res.created_at = QDateTime.fromSecsSinceEpoch(int(created_at_seconds))
         total_comments = input_json.get('totalComments')
         if total_comments is not None:
             res.total_comments = int(total_comments)
@@ -125,9 +126,13 @@ class Listing:
         if total_likes is not None:
             res.total_likes = int(total_likes)
         res.categories = input_json.get('categories', [])
-        # todo geometry
-        # todo
-        # res.created_at = None
+        wkt = input_json.get('geometryWKT')
+        if wkt:
+            res.geometry = QgsGeometry.fromWkt(wkt)
+
+        updated_at_seconds = input_json.get('updatedAt')
+        if updated_at_seconds is not None:
+            res.updated_at = QDateTime.fromSecsSinceEpoch(int(updated_at_seconds))
         return res
 
 
