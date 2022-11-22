@@ -29,6 +29,9 @@ class ApiClientTest(unittest.TestCase):
     """Test API client work."""
 
     def test_listing_from_json(self):
+        """
+        Test creating Listing from JSON
+        """
         json = {
             "owner": "4515f58126704ae4831ffa9d66c395d7",
             "metadata": "{\"description\":\"Creative application of Sentinel 2 water quality script and b/w Google satellite imagery\",\"category\":\"satellite\",\"title\":\"Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019\",\"tc\":true,\"tags\":[]}",
