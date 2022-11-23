@@ -51,7 +51,10 @@ class SoarPlugin:
         self.browse_action = QAction(self.tr("Show Soar.earth Browser"), self.iface.mainWindow())
         self.browse_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
         self.browse_action.setCheckable(True)
+        self.browse_action.setToolTip(self.tr('Browse and search Soar.earth data'))
         self.dock.setToggleVisibilityAction(self.browse_action)
+
+        self.iface.pluginToolBar().addAction(self.browse_action)
 
         self.dock.hide()
 
