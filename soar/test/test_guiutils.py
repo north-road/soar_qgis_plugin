@@ -24,24 +24,22 @@ QGIS_APP = get_qgis_app()
 class GuiUtilsTest(unittest.TestCase):
     """Test GuiUtils work."""
 
-    @unittest.skip('Pending icon files')
     def testGetIcon(self):
         """
         Tests get_icon
         """
         self.assertFalse(
-            GuiUtils.get_icon('filter.svg').isNull())
+            GuiUtils.get_icon('soar_logo.svg').isNull())
         self.assertTrue(GuiUtils.get_icon('not_an_icon.svg').isNull())
 
-    @unittest.skip('Pending icon files')
     def testGetIconSvg(self):
         """
         Tests get_icon svg path
         """
         self.assertTrue(
-            GuiUtils.get_icon_svg('filter.svg'))
-        self.assertIn('filter.svg',
-                      GuiUtils.get_icon_svg('filter.svg'))
+            GuiUtils.get_icon_svg('soar_logo.svg'))
+        self.assertIn('soar_logo.svg',
+                      GuiUtils.get_icon_svg('soar_logo.svg'))
         self.assertFalse(GuiUtils.get_icon_svg('not_an_icon.svg'))
 
     @unittest.skip('Pending ui files')
