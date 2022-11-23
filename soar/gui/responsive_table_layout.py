@@ -28,12 +28,12 @@ from qgis.PyQt.QtWidgets import (
     QWidgetItem
 )
 
-from ..core.client import Listing
-
 from .listing_items import (
     EmptyDatasetItemWidget,
     ListingItemWidget
 )
+from ..core.client import Listing
+
 
 class ResponsiveTableLayout(QLayout):
     """
