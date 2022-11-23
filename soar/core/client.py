@@ -17,13 +17,25 @@ import json
 from enum import Enum
 from typing import (
     Optional,
-    List
+    List,
+    Dict
 )
 
+from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
-    QDateTime
+    pyqtSignal,
+    QObject,
+    QDateTime,
+    QUrl,
+    QUrlQuery
 )
-from qgis.core import QgsGeometry
+from qgis.PyQt.QtNetwork import (
+    QNetworkRequest,
+    QNetworkReply
+)
+from qgis.core import (
+    QgsGeometry
+)
 
 
 class ListingType(Enum):
@@ -48,6 +60,17 @@ class ListingType(Enum):
                 'ORDER': ListingType.Order
                 }[string]
 
+    @staticmethod
+    def to_string(listing: 'Listing') -> str:
+        """
+        Converts a listing value to string
+        """
+        return {ListingType.TileLayer: 'TILE_LAYER',
+                ListingType.Image: 'IMAGE',
+                ListingType.Wms: 'WMS',
+                ListingType.Order: 'ORDER'
+                }[listing]
+
 
 class OrderBy(Enum):
     """
@@ -57,6 +80,17 @@ class OrderBy(Enum):
     Comments = 2
     Likes = 3
     Created = 4
+
+    @staticmethod
+    def to_string(order_by: 'OrderBy') -> str:
+        """
+        Converts a order by value to string
+        """
+        return {OrderBy.Views: 'VIEWS',
+                OrderBy.Comments: 'COMMENTS',
+                OrderBy.Likes: 'LIKES',
+                OrderBy.Created: 'CREATED'
+                }[order_by]
 
 
 class Listing:
@@ -86,6 +120,9 @@ class Listing:
         self.categories: List[str] = []
         self.geometry: Optional[QgsGeometry] = None
         self.updated_at: QDateTime = QDateTime()
+
+    def __repr__(self):
+        return f'<Listing: "{self.title}">'
 
     @staticmethod
     def from_json(input_json: dict) -> 'Listing':
@@ -136,28 +173,118 @@ class Listing:
         return res
 
 
-class ApiClient:
+class ApiClient(QObject):
     """
     API client for soar.earth API
     """
 
-    URL = "https://api.soar-test.earth/v1"
+    URL = "https://api.soar.earth/v1"
+    LISTINGS_ENDPOINT = 'listings'
 
-    def __init__(self):
-        pass
+    error_occurred = pyqtSignal(str)
 
-    def listings(self,
-                 domain: str = 'soar.earth',
-                 user_id: Optional[str] = None,
-                 listing_type: Optional[ListingType] = None,
-                 order_by: Optional[OrderBy] = None,
-                 aoi: Optional[str] = None,  # todo -- rect/geom?
-                 keywords: Optional[List[str]] = None,
-                 category: Optional[str] = None,
-                 featured: Optional[str] = None,
-                 limit: int = 50,
-                 offset: int = 0
-                 ):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        # standard headers to add to all requests
+        self.headers = {
+            'Subdomain': 'soar.earth',
+            'accept': 'application/json'
+        }
+
+    def request_listings(self,
+                         domain: str = 'soar.earth',
+                         user_id: Optional[str] = None,
+                         listing_type: Optional[ListingType] = None,
+                         order_by: Optional[OrderBy] = None,
+                         aoi: Optional[str] = None,  # todo -- rect/geom?
+                         keywords: Optional[str] = None,
+                         category: Optional[str] = None,
+                         featured: Optional[str] = None,
+                         limit: int = 50,
+                         offset: int = 0
+                         ) -> QNetworkRequest:
         """
-        Retrieves listings for a set of parameters
+        Retrieves listings for a set of parameters (async)
+
+        The returned network request must be retrieved via QgsNetworkAccessManager,
+        and the reply parsed by parse_listings_reply
         """
+        params = {}
+        if keywords:
+            params['keywords'] = keywords
+        if user_id:
+            params['userId'] = user_id
+        if limit:
+            params['limit'] = limit
+        if offset:
+            params['offset'] = offset
+        if listing_type:
+            params['listingType'] = ListingType.to_string(listing_type)
+        if order_by:
+            params['orderBy'] = OrderBy.to_string(order_by)
+        if category:
+            params['category'] = category
+        if featured:
+            params['featured'] = featured
+
+        headers = {}
+        if domain:
+            headers = {
+                'Subdomain': domain
+            }
+        network_request = self._build_request(self.LISTINGS_ENDPOINT, headers, params)
+
+        return network_request
+
+    def parse_listings_reply(self, reply: QNetworkReply) -> List[Listing]:
+        """
+        Parse a listings reply and return as a list of Listings objects
+        """
+        if sip.isdeleted(self):
+            print('deleted')
+            return []
+
+        if reply.error() == QNetworkReply.OperationCanceledError:
+            print('canceled')
+            return []
+
+        if reply.error() != QNetworkReply.NoError:
+            self.error_occurred.emit(reply.errorString())
+            return []
+
+        listings_json = json.loads(reply.readAll().data().decode())['listings']
+        return [Listing.from_json(listing) for listing in listings_json]
+
+    @staticmethod
+    def _to_url_query(parameters: Dict[str, object]) -> QUrlQuery:
+        """
+        Converts query parameters as a dictionary to a URL query
+        """
+        query = QUrlQuery()
+        for name, value in parameters.items():
+            if isinstance(value, (list, tuple)):
+                for v in value:
+                    query.addQueryItem(name, str(v))
+            else:
+                query.addQueryItem(name, str(value))
+        return query
+
+    def _build_request(self, endpoint: str, headers=None, params=None) -> QNetworkRequest:
+        """
+        Builds a network request
+        """
+        url = QUrl(f"{self.URL}/{endpoint}")
+
+        if params:
+            url.setQuery(ApiClient._to_url_query(params))
+
+        network_request = QNetworkRequest(url)
+
+        combined_headers = self.headers
+        if headers:
+            combined_headers.update(headers)
+
+        for header, value in combined_headers.items():
+            network_request.setRawHeader(header.encode(), value.encode())
+
+        return network_request

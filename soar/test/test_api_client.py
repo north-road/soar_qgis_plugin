@@ -15,16 +15,21 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 import unittest
+from functools import partial
 
 from qgis.PyQt.QtCore import (
     Qt,
     QDateTime
 )
+from qgis.PyQt.QtTest import QSignalSpy
+from qgis.core import QgsNetworkAccessManager
 
 from .utilities import get_qgis_app
 from ..core.client import (
     Listing,
-    ListingType
+    ListingType,
+    ApiClient,
+    OrderBy
 )
 
 QGIS_APP = get_qgis_app()
@@ -85,7 +90,8 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.user_name, 'TheRealDazzler')
         self.assertEqual(listing.user_id, '4515f58126704ae4831ffa9d66c395d7')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
-        self.assertEqual(listing.created_at.toUTC(), QDateTime(2021, 9, 1, 3, 42, 51, 0, Qt.TimeSpec(1)))
+        self.assertEqual(listing.created_at.toUTC(),
+                         QDateTime(2021, 9, 1, 3, 42, 51, 0, Qt.TimeSpec(1)))
         self.assertEqual(listing.total_comments, 1)
         self.assertEqual(listing.filename,
                          "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi dam_8ab6c81cd0d07457796a87da86a7ae38.tiff")
@@ -94,9 +100,55 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.filehash, '8ab6c81cd0d07457796a87da86a7ae38')
         self.assertEqual(listing.total_likes, 33)
         self.assertEqual(listing.categories, ['marine', 'environment'])
-        self.assertEqual(listing.geometry.asWkt(1), 'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
+        self.assertEqual(listing.geometry.asWkt(1),
+                         'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
         self.assertEqual(listing.updated_at.toUTC(),
                          QDateTime(2022, 11, 22, 21, 42, 36, 0, Qt.TimeSpec(1)))
+
+    def test_listing_request(self):
+        """
+        Test building listing requests
+        """
+        client = ApiClient()
+        request = client.request_listings(limit=2, keywords='flood',
+                                          user_id='4515f58126704ae4831ffa9d66c395d7')
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings?keywords=flood&userId=4515f58126704ae4831ffa9d66c395d7&limit=2')
+        self.assertEqual(request.rawHeader(b'Subdomain'), b'soar.earth')
+
+        request = client.request_listings(domain='test.earth',
+                                          listing_type=ListingType.Wms,
+                                          order_by=OrderBy.Comments,
+                                          keywords='flood',
+                                          category='categ',
+                                          featured='feat',
+                                          offset=5)
+        self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS&orderBy=COMMENTS&category=categ&featured=feat')
+
+    # pylint: disable=attribute-defined-outside-init
+
+    def test_listing_reply(self):
+        """
+        Test handling listing replies
+        """
+        client = ApiClient()
+        request = client.request_listings(limit=2, keywords='flood',
+                                          user_id='4515f58126704ae4831ffa9d66c395d7')
+        reply = QgsNetworkAccessManager.instance().get(request)
+        self._result = None
+
+        def finished(_reply):
+            self._result = client.parse_listings_reply(_reply)
+
+        reply.finished.connect(partial(finished, reply))
+        spy = QSignalSpy(reply.finished)
+        spy.wait()
+
+        self.assertEqual(len(self._result), 2)
+        self.assertEqual(self._result[0].id, 10465)
+        self.assertEqual(self._result[1].id, 10464)
 
 
 if __name__ == "__main__":
