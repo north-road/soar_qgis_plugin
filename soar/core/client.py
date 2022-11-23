@@ -196,7 +196,7 @@ class ApiClient(QObject):
                          user_id: Optional[str] = None,
                          listing_type: Optional[ListingType] = None,
                          order_by: Optional[OrderBy] = None,
-                         aoi: Optional[str] = None,  # todo -- rect/geom?
+                         aoi: Optional[QgsGeometry] = None,
                          keywords: Optional[str] = None,
                          category: Optional[str] = None,
                          featured: Optional[str] = None,
@@ -226,6 +226,8 @@ class ApiClient(QObject):
             params['category'] = category
         if featured:
             params['featured'] = featured
+        if aoi and not aoi.isEmpty():
+            params['aoi'] = aoi.asWkt()
 
         headers = {}
         if domain:

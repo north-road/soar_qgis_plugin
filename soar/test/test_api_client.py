@@ -22,7 +22,10 @@ from qgis.PyQt.QtCore import (
     QDateTime
 )
 from qgis.PyQt.QtTest import QSignalSpy
-from qgis.core import QgsNetworkAccessManager
+from qgis.core import (
+    QgsGeometry,
+    QgsNetworkAccessManager
+)
 
 from .utilities import get_qgis_app
 from ..core.client import (
@@ -126,6 +129,15 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS&orderBy=COMMENTS&category=categ&featured=feat')
+
+        request = client.request_listings(aoi=QgsGeometry.fromWkt(
+            'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings?limit=50&aoi=Polygon '
+                         '((15.81361599999999967 49.50176700000000096, 15.67047099999999915 '
+                         '49.50176700000000096, 15.67047099999999915 49.39756100000000316, '
+                         '15.81361599999999967 49.39756100000000316, 15.81361599999999967 '
+                         '49.50176700000000096))')
 
     # pylint: disable=attribute-defined-outside-init
 
