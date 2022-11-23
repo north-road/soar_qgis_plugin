@@ -173,6 +173,57 @@ class Listing:
         return res
 
 
+class ListingQuery:
+    """
+    Represents a listing query
+    """
+
+    def __init__(self,
+                 user_id: Optional[str] = None,
+                 listing_type: Optional[ListingType] = None,
+                 order_by: Optional[OrderBy] = None,
+                 aoi: Optional[QgsGeometry] = None,
+                 keywords: Optional[str] = None,
+                 category: Optional[str] = None,
+                 featured: Optional[str] = None,
+                 limit: int = 50,
+                 offset: int = 0):
+        self.user_id: Optional[str] = user_id
+        self.listing_type: Optional[ListingType] = listing_type
+        self.order_by: Optional[OrderBy] = order_by
+        self.aoi: Optional[QgsGeometry] = aoi
+        self.keywords: Optional[str] = keywords
+        self.category: Optional[str] = category
+        self.featured: Optional[str] = featured
+        self.limit: int = limit
+        self.offset: int = offset
+
+    def to_query_parameters(self) -> dict:
+        """
+        Converts the query to a dictionary of query parameters
+        """
+        params = {}
+        if self.keywords:
+            params['keywords'] = self.keywords
+        if self.user_id:
+            params['userId'] = self.user_id
+        if self.limit:
+            params['limit'] = self.limit
+        if self.offset:
+            params['offset'] = self.offset
+        if self.listing_type:
+            params['listingType'] = ListingType.to_string(self.listing_type)
+        if self.order_by:
+            params['orderBy'] = OrderBy.to_string(self.order_by)
+        if self.category:
+            params['category'] = self.category
+        if self.featured:
+            params['featured'] = self.featured
+        if self.aoi and not self.aoi.isEmpty():
+            params['aoi'] = self.aoi.asWkt()
+        return params
+
+
 class ApiClient(QObject):
     """
     API client for soar.earth API
@@ -192,16 +243,8 @@ class ApiClient(QObject):
         }
 
     def request_listings(self,
+                         query: ListingQuery,
                          domain: str = 'soar.earth',
-                         user_id: Optional[str] = None,
-                         listing_type: Optional[ListingType] = None,
-                         order_by: Optional[OrderBy] = None,
-                         aoi: Optional[QgsGeometry] = None,
-                         keywords: Optional[str] = None,
-                         category: Optional[str] = None,
-                         featured: Optional[str] = None,
-                         limit: int = 50,
-                         offset: int = 0
                          ) -> QNetworkRequest:
         """
         Retrieves listings for a set of parameters (async)
@@ -209,25 +252,7 @@ class ApiClient(QObject):
         The returned network request must be retrieved via QgsNetworkAccessManager,
         and the reply parsed by parse_listings_reply
         """
-        params = {}
-        if keywords:
-            params['keywords'] = keywords
-        if user_id:
-            params['userId'] = user_id
-        if limit:
-            params['limit'] = limit
-        if offset:
-            params['offset'] = offset
-        if listing_type:
-            params['listingType'] = ListingType.to_string(listing_type)
-        if order_by:
-            params['orderBy'] = OrderBy.to_string(order_by)
-        if category:
-            params['category'] = category
-        if featured:
-            params['featured'] = featured
-        if aoi and not aoi.isEmpty():
-            params['aoi'] = aoi.asWkt()
+        params = query.to_query_parameters()
 
         headers = {}
         if domain:

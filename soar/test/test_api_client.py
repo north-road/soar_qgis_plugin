@@ -32,7 +32,8 @@ from ..core.client import (
     Listing,
     ListingType,
     ApiClient,
-    OrderBy
+    OrderBy,
+    ListingQuery
 )
 
 QGIS_APP = get_qgis_app()
@@ -113,25 +114,29 @@ class ApiClientTest(unittest.TestCase):
         Test building listing requests
         """
         client = ApiClient()
-        request = client.request_listings(limit=2, keywords='flood',
-                                          user_id='4515f58126704ae4831ffa9d66c395d7')
+
+        query = ListingQuery(limit=2, keywords='flood',
+                             user_id='4515f58126704ae4831ffa9d66c395d7')
+        request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&userId=4515f58126704ae4831ffa9d66c395d7&limit=2')
         self.assertEqual(request.rawHeader(b'Subdomain'), b'soar.earth')
 
-        request = client.request_listings(domain='test.earth',
-                                          listing_type=ListingType.Wms,
-                                          order_by=OrderBy.Comments,
-                                          keywords='flood',
-                                          category='categ',
-                                          featured='feat',
-                                          offset=5)
+        query = ListingQuery(
+            listing_type=ListingType.Wms,
+            order_by=OrderBy.Comments,
+            keywords='flood',
+            category='categ',
+            featured='feat',
+            offset=5)
+        request = client.request_listings(query, domain='test.earth')
         self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS&orderBy=COMMENTS&category=categ&featured=feat')
 
-        request = client.request_listings(aoi=QgsGeometry.fromWkt(
+        query = ListingQuery(aoi=QgsGeometry.fromWkt(
             'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))
+        request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?limit=50&aoi=Polygon '
                          '((15.81361599999999967 49.50176700000000096, 15.67047099999999915 '
@@ -146,8 +151,9 @@ class ApiClientTest(unittest.TestCase):
         Test handling listing replies
         """
         client = ApiClient()
-        request = client.request_listings(limit=2, keywords='flood',
-                                          user_id='4515f58126704ae4831ffa9d66c395d7')
+        query = ListingQuery(limit=2, keywords='flood',
+                             user_id='4515f58126704ae4831ffa9d66c395d7')
+        request = client.request_listings(query)
         reply = QgsNetworkAccessManager.instance().get(request)
         self._result = None
 
