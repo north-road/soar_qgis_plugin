@@ -14,7 +14,16 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 
-def classFactory(iface):
-    from soar.plugin import SoarPlugin
+class SoarPlugin(object):
+    """
+    Soar.earth plugin
+    """
 
-    return SoarPlugin(iface)
+    def __init__(self, iface):
+        self.iface = iface
+
+    def initGui(self):
+        pass
+
+    def unload(self):
+        pass
