@@ -13,6 +13,9 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
+from qgis.PyQt.QtCore import (
+    QTimer
+)
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QVBoxLayout
@@ -35,11 +38,11 @@ class BrowseWidget(QWidget):
 
         vl = QVBoxLayout()
 
-        self.search_edit =QgsFilterLineEdit()
+        self.search_edit = QgsFilterLineEdit()
         self.search_edit.setShowSearchIcon(True)
         self.search_edit.setShowClearButton(True)
         self.search_edit.setPlaceholderText(self.tr('Search'))
-        self.search_edit.textChanged.connect(self._search)
+        self.search_edit.textChanged.connect(self._filter_widget_changed)
 
         vl.addWidget(self.search_edit)
 
@@ -48,8 +51,23 @@ class BrowseWidget(QWidget):
 
         self.setLayout(vl)
 
-    def _search(self):
+        # changes to filter parameters are deferred to a small timeout, to avoid
+        # starting lots of queries while a user is mid-operation (such as dragging a slider)
+        self._update_query_timeout = QTimer(self)
+        self._update_query_timeout.setSingleShot(True)
+        self._update_query_timeout.timeout.connect(self._update_query)
+
+    def _filter_widget_changed(self):
+        """
+        Triggered whenever any of the search filter widgets are changed
+        """
+        # changes to filter parameters are deferred to a small timeout, to avoid
+        # starting lots of queries while a user is mid-operation (such as dragging a slider)
+        self._update_query_timeout.start(500)
+
+    def _update_query(self):
+        """
+        Updates the listings
+        """
         query = ListingQuery(keywords=self.search_edit.text())
         self.browser.populate(query)
-
-
