@@ -71,3 +71,9 @@ class BrowseWidget(QWidget):
         """
         query = ListingQuery(keywords=self.search_edit.text())
         self.browser.populate(query)
+
+    def cancel_active_requests(self):
+        """
+        Cancels any active request
+        """
+        self.browser.cancel_active_requests()
