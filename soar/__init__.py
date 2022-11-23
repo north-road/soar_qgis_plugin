@@ -15,6 +15,9 @@ __revision__ = '$Format:%H$'
 
 
 def classFactory(iface):
-    from soar.plugin import SoarPlugin
+    """
+    Creates the plugin
+    """
+    from soar.plugin import SoarPlugin  # pylint: disable=import-outside-toplevel
 
     return SoarPlugin(iface)
