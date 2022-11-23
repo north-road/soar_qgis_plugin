@@ -25,6 +25,7 @@ from qgis.PyQt.QtWidgets import (
     QAction
 )
 
+from .gui import GuiUtils
 from .gui.browser_dock_widget import BrowserDockWidget
 
 
@@ -48,6 +49,7 @@ class SoarPlugin:
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
 
         self.browse_action = QAction(self.tr("Show Soar.earth Browser"), self.iface.mainWindow())
+        self.browse_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
         self.browse_action.setCheckable(True)
         self.dock.setToggleVisibilityAction(self.browse_action)
 
