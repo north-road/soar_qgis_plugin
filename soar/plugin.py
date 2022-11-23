@@ -25,8 +25,41 @@ from qgis.PyQt.QtWidgets import (
     QAction
 )
 
+from qgis.core import (
+    QgsProviderRegistry
+)
+
+from qgis.gui import (
+    QgsGui,
+    QgsSourceSelectProvider
+)
+
 from .gui import GuiUtils
 from .gui.browser_dock_widget import BrowserDockWidget
+from .gui.data_source_widget import SoarDataSourceWidget
+
+class SoarSourceSelectProvider(QgsSourceSelectProvider):
+    """
+    Data source manager widget provider for soar.earth datasets
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def providerKey(self):
+        return 'soar.earth'
+
+    def text(self):
+        return SoarPlugin.tr('Soar.earth')
+
+    def toolTip(self):
+        return SoarPlugin.tr('Browse and search Soar.earth data')
+
+    def icon(self):
+        return GuiUtils.get_icon('soar_logo.svg')
+
+    def createDataSourceWidget(self, parent=None, fl = Qt.Widget, widgetMode =QgsProviderRegistry.WidgetMode.Embedded):
+        return SoarDataSourceWidget()
 
 
 class SoarPlugin:
@@ -39,6 +72,8 @@ class SoarPlugin:
 
         self.dock: Optional[BrowserDockWidget] = None
         self.browse_action: Optional[QAction] = None
+
+        self.source_select_provider: Optional[SoarSourceSelectProvider] = None
 
     # qgis plugin interface
 
@@ -56,6 +91,9 @@ class SoarPlugin:
 
         self.iface.pluginToolBar().addAction(self.browse_action)
 
+        self.source_select_provider = SoarSourceSelectProvider()
+        QgsGui.sourceSelectProviderRegistry().addProvider(self.source_select_provider)
+
         self.dock.hide()
 
     def unload(self):
@@ -68,6 +106,10 @@ class SoarPlugin:
         if not sip.isdeleted(self.browse_action):
             self.browse_action.deleteLater()
         self.browse_action = None
+
+        if self.source_select_provider and not sip.isdeleted(self.source_select_provider):
+            QgsGui.sourceSelectProviderRegistry().removeProvider(self.source_select_provider)
+        self.source_select_provider = None
 
         QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
 
