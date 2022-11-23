@@ -24,11 +24,9 @@ from qgis.PyQt.QtCore import (
 from qgis.PyQt.QtWidgets import (
     QAction
 )
-
 from qgis.core import (
     QgsProviderRegistry
 )
-
 from qgis.gui import (
     QgsGui,
     QgsSourceSelectProvider
@@ -38,13 +36,14 @@ from .gui import GuiUtils
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
 
+
 class SoarSourceSelectProvider(QgsSourceSelectProvider):
     """
     Data source manager widget provider for soar.earth datasets
     """
 
-    def __init__(self):
-        super().__init__()
+    # QgsSourceSelectProvider interface
+    # pylint: disable=missing-function-docstring,unused-argument
 
     def providerKey(self):
         return 'soar.earth'
@@ -58,8 +57,13 @@ class SoarSourceSelectProvider(QgsSourceSelectProvider):
     def icon(self):
         return GuiUtils.get_icon('soar_logo.svg')
 
-    def createDataSourceWidget(self, parent=None, fl = Qt.Widget, widgetMode =QgsProviderRegistry.WidgetMode.Embedded):
+    def createDataSourceWidget(self,
+                               parent=None,
+                               fl=Qt.Widget,
+                               widgetMode=QgsProviderRegistry.WidgetMode.Embedded):
         return SoarDataSourceWidget()
+
+    # pylint: enable=missing-function-docstring,unused-argument
 
 
 class SoarPlugin:

@@ -24,6 +24,9 @@ from .browse_widget import BrowseWidget
 
 
 class SoarDataSourceWidget(QgsAbstractDataSourceWidget):
+    """
+    QGIS Data source manager widget for browsing soar.earth data
+    """
 
     def __init__(self):
         super().__init__()
