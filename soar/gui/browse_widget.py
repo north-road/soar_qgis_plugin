@@ -32,10 +32,13 @@ from qgis.core import (
 )
 
 from qgis.gui import (
-    QgsFilterLineEdit
+    QgsFilterLineEdit,
+    QgsPanelWidgetStack
 )
 
 from .listings_browser_widget import ListingsBrowserWidget
+from .listing_details_widget import ListingDetailsWidget
+
 from ..core.client import (
     ApiClient,
     Listing,
@@ -64,9 +67,16 @@ class BrowseWidget(QWidget):
 
         vl.addWidget(self.search_edit)
 
+        self.panel_stack = QgsPanelWidgetStack()
+
         self.browser = ListingsBrowserWidget()
         self.browser.listing_clicked.connect(self._on_listing_clicked)
-        vl.addWidget(self.browser, 1)
+
+        self.panel_stack.setMainPanel(self.browser)
+
+        self.listing_details_pane: Optional[ListingDetailsWidget] = None
+
+        vl.addWidget(self.panel_stack, 1)
 
         self.setLayout(vl)
 
@@ -102,6 +112,15 @@ class BrowseWidget(QWidget):
     def _on_listing_clicked(self, listing: Listing):
         """
         Triggered when a listing item is clicked
+        """
+
+        self.listing_details_pane = ListingDetailsWidget(listing)
+        self.listing_details_pane.add_to_map.connect(self._add_listing_to_map)
+        self.panel_stack.showPanel(self.listing_details_pane)
+
+    def _add_listing_to_map(self, listing: Listing):
+        """
+        Called when a listing should be added to the map
         """
         if listing.listing_type != ListingType.TileLayer:
             # todo -- what to do with these?
@@ -144,4 +163,4 @@ class BrowseWidget(QWidget):
             return
 
         listing = self.api_client.parse_listing_reply(reply)
-        self._on_listing_clicked(listing)
+        self._add_listing_to_map(listing)
