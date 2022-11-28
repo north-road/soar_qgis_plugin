@@ -24,6 +24,7 @@ from typing import (
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
     pyqtSignal,
+    Qt,
     QObject,
     QDateTime,
     QUrl,
@@ -34,11 +35,14 @@ from qgis.PyQt.QtNetwork import (
     QNetworkReply
 )
 from qgis.core import (
+    QgsBox3d,
     QgsGeometry,
     QgsRasterLayer,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
-    QgsProject
+    QgsProject,
+    QgsLayerMetadata,
+    QgsAbstractMetadataBase
 )
 
 
@@ -185,6 +189,39 @@ class Listing:
 
         return layer_uri
 
+    def to_layer_metadata(self) -> Optional[QgsLayerMetadata]:
+        """
+        Converts the listing to QGIS layer metadata
+        """
+        res = QgsLayerMetadata()
+        if self.id:
+            res.setIdentifier(str(self.id))
+        res.setType('dataset')
+        res.setTitle(self.title)
+        res.setAbstract(self.description)
+        if self.tags:
+            res.addKeywords('tags', self.tags)
+        res.setCategories(self.categories)
+
+        if self.user:
+            author = QgsAbstractMetadataBase.Contact()
+            author.name = self.user.name
+            author.role = 'author'
+            res.addContact(author)
+
+        if self.geometry and not self.geometry.isEmpty():
+            extent = QgsLayerMetadata.Extent()
+            spatial_extent = QgsLayerMetadata.SpatialExtent()
+            spatial_extent.extentCrs = QgsCoordinateReferenceSystem('EPSG:4326')
+            spatial_extent.bounds = QgsBox3d(self.geometry.boundingBox())
+            extent.setSpatialExtents([spatial_extent])
+            res.setExtent(extent)
+
+        res.setCrs(QgsCoordinateReferenceSystem('EPSG:3857'))
+
+        # todo license? use constraints? link?
+        return res
+
     def to_qgis_layer(self) -> Optional[QgsRasterLayer]:
         """
         Returns a QgsRasterLayer for the listing
@@ -204,6 +241,12 @@ class Listing:
                 QgsProject.instance())
             extent_3857 = transform.transformBoundingBox(self.geometry.boundingBox())
             layer.setExtent(extent_3857)
+
+        layer.setMetadata(self.to_layer_metadata())
+
+        layer.setCustomProperty('_soar_layer_id', self.id)
+        if self.tile_url_expiry_at:
+            layer.setCustomProperty('_soar_layer_expiry', self.tile_url_expiry_at.toString(Qt.ISODate))
 
         return layer
 
