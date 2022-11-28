@@ -32,13 +32,17 @@ from qgis.PyQt.QtWidgets import (
     QLabel,
     QToolButton,
     QVBoxLayout,
-    QSizePolicy,
-    QWidget
+    QSizePolicy
 )
 from qgis.core import QgsNetworkAccessManager
-from qgis.gui import QgsScrollArea
+from qgis.gui import (
+    QgsScrollArea,
+    QgsPanelWidget
+)
+
 
 from .responsive_table_layout import ResponsiveTableWidget
+
 from ..core.client import (
     ApiClient,
     Listing,
@@ -48,7 +52,7 @@ from ..core.client import (
 PAGE_SIZE = 20
 
 
-class ListingsBrowserWidget(QWidget):
+class ListingsBrowserWidget(QgsPanelWidget):
     """
     A widget showing listings
     """
@@ -59,6 +63,8 @@ class ListingsBrowserWidget(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.setPanelTitle(self.tr('Listings'))
 
         self.api_client = ApiClient()
 
