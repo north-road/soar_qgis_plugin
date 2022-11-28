@@ -18,7 +18,8 @@ from typing import Optional
 from qgis.PyQt.QtCore import (
     Qt,
     QSize,
-    QRect
+    QRect,
+    pyqtSignal
 )
 from qgis.PyQt.QtGui import (
     QCursor,
@@ -112,6 +113,8 @@ class ListingItemWidget(ListingItemWidgetBase):
     Shows details for a listing
     """
 
+    clicked = pyqtSignal(Listing)
+
     def __init__(self, listing: Listing, parent=None):
         super().__init__(parent)
 
@@ -161,7 +164,7 @@ class ListingItemWidget(ListingItemWidgetBase):
     # pylint: disable=missing-function-docstring,unused-argument
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.show_details()
+            self.clicked.emit(self.listing)
         else:
             super().mousePressEvent(event)
 
@@ -174,11 +177,6 @@ class ListingItemWidget(ListingItemWidgetBase):
             self._hide_footprint()
 
     # pylint: enable=missing-function-docstring,unused-argument
-
-    def show_details(self):
-        """
-        Shows details of the listing
-        """
 
     def set_thumbnail(self, img: Optional[QImage]):
         """

@@ -41,6 +41,7 @@ from qgis.gui import QgsScrollArea
 from .responsive_table_layout import ResponsiveTableWidget
 from ..core.client import (
     ApiClient,
+    Listing,
     ListingQuery
 )
 
@@ -52,9 +53,9 @@ class ListingsBrowserWidget(QWidget):
     A widget showing listings
     """
 
-    datasetDetailsRequested = pyqtSignal(dict)
     total_count_changed = pyqtSignal(int)
     visible_count_changed = pyqtSignal(int)
+    listing_clicked = pyqtSignal(Listing)
 
     def __init__(self):
         super().__init__()
@@ -69,6 +70,7 @@ class ListingsBrowserWidget(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
 
         self.table_widget = ResponsiveTableWidget()
+        self.table_widget.listing_clicked.connect(self.listing_clicked)
         self.scroll_area.setWidget(self.table_widget)
 
         layout.addWidget(self.scroll_area)
