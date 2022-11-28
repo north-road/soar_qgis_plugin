@@ -25,7 +25,8 @@ from qgis.PyQt.QtWidgets import (
     QAction
 )
 from qgis.core import (
-    QgsProviderRegistry
+    QgsProviderRegistry,
+    QgsProject
 )
 from qgis.gui import (
     QgsGui,
@@ -35,6 +36,7 @@ from qgis.gui import (
 from .gui import GuiUtils
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
+from .core.project_manager import ProjectManager
 
 
 class SoarSourceSelectProvider(QgsSourceSelectProvider):
@@ -78,6 +80,7 @@ class SoarPlugin:
         self.browse_action: Optional[QAction] = None
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
+        self.project_manager = ProjectManager(QgsProject.instance())
 
     # qgis plugin interface
 
