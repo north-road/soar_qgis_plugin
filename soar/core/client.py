@@ -93,6 +93,40 @@ class OrderBy(Enum):
                 }[order_by]
 
 
+class User:
+    """
+    Encapsulates a soar.earth user
+    """
+
+    def __init__(self):
+        self.created_at: QDateTime = QDateTime()
+        self.avatar_url: Optional[str] = None
+        self.name: Optional[str] = None
+        self.user_id: Optional[str] = None
+        self.eth_address: Optional[str] = None
+
+    def __repr__(self):
+        return f'<User: "{self.name}">'
+
+    @staticmethod
+    def from_json(input_json: dict) -> 'User':
+        """
+        Creates a user from JSON
+        """
+        res = User()
+
+        created_at_seconds = input_json.get('createdAt')
+        if created_at_seconds is not None:
+            res.created_at = QDateTime.fromSecsSinceEpoch(int(created_at_seconds))
+
+        res.avatar_url = input_json.get('avatarUrl')
+        res.name = input_json.get('name')
+        res.user_id = input_json.get('userId')
+        res.eth_address = input_json.get('ethAddress')
+
+        return res
+
+
 class Listing:
     """
     Encapsulates a soar.earth dataset listing
@@ -102,13 +136,11 @@ class Listing:
         self.owner: Optional[str] = None
         self.metadata = {}
         self.preview_url: Optional[str] = None
-        self.avatar_url: Optional[str] = None
+        self.user: Optional[User] = None
         self.description: Optional[str] = None
         self.min_zoom: Optional[int] = None
         self.listing_type: ListingType = ListingType.TileLayer
         self.title: Optional[str] = None
-        self.user_name: Optional[str] = None
-        self.user_id: Optional[str] = None
         self.tags: List[str] = []
         self.created_at: QDateTime = QDateTime()
         self.total_comments: int = 0
@@ -135,15 +167,19 @@ class Listing:
         if metadata_json:
             res.metadata = json.loads(metadata_json)
         res.preview_url = input_json.get('previewUrl')
-        res.avatar_url = input_json.get('avatarUrl')
         res.description = input_json.get('description')
         min_zoom = input_json.get('minZoom')
         if min_zoom:
             res.min_zoom = int(min_zoom)
         res.listing_type = ListingType.from_string(input_json.get('listingType'))
         res.title = input_json.get('title')
-        res.user_name = input_json.get('userName')
-        res.user_id = input_json.get('userId')
+
+        if 'userId' in input_json:
+            res.user = User()
+            res.user.avatar_url = input_json.get('avatarUrl')
+            res.user.name = input_json.get('userName')
+            res.user.user_id = input_json.get('userId')
+
         res.tags = input_json.get('tags', [])
         created_at_seconds = input_json.get('createdAt')
         if created_at_seconds is not None:

@@ -30,6 +30,7 @@ from qgis.core import (
 from .utilities import get_qgis_app
 from ..core.client import (
     Listing,
+    User,
     ListingType,
     ApiClient,
     OrderBy,
@@ -41,6 +42,27 @@ QGIS_APP = get_qgis_app()
 
 class ApiClientTest(unittest.TestCase):
     """Test API client work."""
+
+    def test_user_from_json(self):
+        """
+        Test creating User from JSON
+        """
+        json = {
+            "createdAt": 1571710337,
+            "avatarUrl": "https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview",
+            "name": "TheRealDazzler",
+            "userId": "4515f58126704ae4831ffa9d66c395d7",
+            "ethAddress": "1234"
+        }
+
+        user = User.from_json(json)
+        self.assertEqual(user.created_at.toUTC(),
+                         QDateTime(2019, 10, 22, 2, 12, 17, 0, Qt.TimeSpec(1)))
+        self.assertEqual(user.avatar_url,
+                         'https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview')
+        self.assertEqual(user.name, 'TheRealDazzler')
+        self.assertEqual(user.user_id, '4515f58126704ae4831ffa9d66c395d7')
+        self.assertEqual(user.eth_address, '1234')
 
     def test_listing_from_json(self):
         """
@@ -83,16 +105,16 @@ class ApiClientTest(unittest.TestCase):
             "tags": []})
         self.assertEqual(listing.preview_url,
                          'https://short-preview.soar.earth/preview%2Fbrowser%2Fprod%2F4515f58126704ae4831ffa9d66c395d7%40soar%2Fyamchi+dam_8ab6c81cd0d07457796a87da86a7ae38.tiff.png')
-        self.assertEqual(listing.avatar_url,
+        self.assertEqual(listing.user.avatar_url,
                          'https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview')
+        self.assertEqual(listing.user.name, 'TheRealDazzler')
+        self.assertEqual(listing.user.user_id, '4515f58126704ae4831ffa9d66c395d7')
         self.assertEqual(listing.description,
                          'Creative application of Sentinel 2 water quality script and b/w Google satellite imagery')
         self.assertEqual(listing.min_zoom, 12)
         self.assertEqual(listing.listing_type, ListingType.TileLayer)
         self.assertEqual(listing.title,
                          'Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019')
-        self.assertEqual(listing.user_name, 'TheRealDazzler')
-        self.assertEqual(listing.user_id, '4515f58126704ae4831ffa9d66c395d7')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
         self.assertEqual(listing.created_at.toUTC(),
                          QDateTime(2021, 9, 1, 3, 42, 51, 0, Qt.TimeSpec(1)))
