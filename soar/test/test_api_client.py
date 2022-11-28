@@ -268,6 +268,7 @@ class ApiClientTest(unittest.TestCase):
 
         query = ListingQuery(limit=2, keywords='flood',
                              user_id='4515f58126704ae4831ffa9d66c395d7')
+        query.listing_type = None
         request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&userId=4515f58126704ae4831ffa9d66c395d7&limit=2')
@@ -289,7 +290,7 @@ class ApiClientTest(unittest.TestCase):
             'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))
         request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
-                         'https://api.soar.earth/v1/listings?limit=50&aoi=Polygon '
+                         'https://api.soar.earth/v1/listings?limit=50&listingType=TILE_LAYER&aoi=Polygon '
                          '((15.81361599999999967 49.50176700000000096, 15.67047099999999915 '
                          '49.50176700000000096, 15.67047099999999915 49.39756100000000316, '
                          '15.81361599999999967 49.39756100000000316, 15.81361599999999967 '

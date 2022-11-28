@@ -274,7 +274,8 @@ class ListingQuery:
                  limit: int = 50,
                  offset: int = 0):
         self.user_id: Optional[str] = user_id
-        self.listing_type: Optional[ListingType] = listing_type
+        # default to filtering to tile layers only
+        self.listing_type: Optional[ListingType] = listing_type if listing_type is not None else ListingType.TileLayer
         self.order_by: Optional[OrderBy] = order_by
         self.aoi: Optional[QgsGeometry] = aoi
         self.keywords: Optional[str] = keywords
