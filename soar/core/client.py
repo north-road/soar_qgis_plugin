@@ -152,12 +152,17 @@ class Listing:
         self.categories: List[str] = []
         self.geometry: Optional[QgsGeometry] = None
         self.updated_at: QDateTime = QDateTime()
+        self.tile_url: Optional[str] = None
+        self.file_size: Optional[int] = None
+        self.domain_name: Optional[str] = None
+        self.files: List[str] = []
+        self.tile_url_expiry_at: QDateTime = QDateTime()
 
     def __repr__(self):
         return f'<Listing: "{self.title}">'
 
     @staticmethod
-    def from_json(input_json: dict) -> 'Listing':
+    def from_json(input_json: dict) -> 'Listing':  # pylint:disable=too-many-statements
         """
         Creates a listing from JSON
         """
@@ -180,6 +185,8 @@ class Listing:
             res.user.name = input_json.get('userName')
             res.user.user_id = input_json.get('userId')
 
+        res.categories = input_json.get('categories', [])
+
         res.tags = input_json.get('tags', [])
         created_at_seconds = input_json.get('createdAt')
         if created_at_seconds is not None:
@@ -198,14 +205,25 @@ class Listing:
         total_likes = input_json.get('totalLikes')
         if total_likes is not None:
             res.total_likes = int(total_likes)
-        res.categories = input_json.get('categories', [])
         wkt = input_json.get('geometryWKT')
         if wkt:
             res.geometry = QgsGeometry.fromWkt(wkt)
 
+        res.tile_url = input_json.get('tileUrl')
+        file_size = input_json.get('filesize')
+        if file_size is not None:
+            res.file_size = int(file_size)
+
         updated_at_seconds = input_json.get('updatedAt')
         if updated_at_seconds is not None:
             res.updated_at = QDateTime.fromSecsSinceEpoch(int(updated_at_seconds))
+
+        res.domain_name = input_json.get('domainName')
+
+        tile_url_expiry = input_json.get('tileUrlExpiryAt')
+        if tile_url_expiry is not None:
+            res.tile_url_expiry_at = QDateTime.fromSecsSinceEpoch(int(tile_url_expiry))
+
         return res
 
 
@@ -299,16 +317,30 @@ class ApiClient(QObject):
 
         return network_request
 
+    def request_listing(self,
+                        listing_id: int,
+                        domain: str = 'soar.earth', ) -> QNetworkRequest:
+        """
+        Creates a listing request
+        """
+        headers = {}
+        if domain:
+            headers = {
+                'Subdomain': domain
+            }
+        network_request = self._build_request(f'{self.LISTINGS_ENDPOINT}/{listing_id}',
+                                              headers)
+
+        return network_request
+
     def parse_listings_reply(self, reply: QNetworkReply) -> List[Listing]:
         """
         Parse a listings reply and return as a list of Listings objects
         """
         if sip.isdeleted(self):
-            print('deleted')
             return []
 
         if reply.error() == QNetworkReply.OperationCanceledError:
-            print('canceled')
             return []
 
         if reply.error() != QNetworkReply.NoError:
@@ -317,6 +349,23 @@ class ApiClient(QObject):
 
         listings_json = json.loads(reply.readAll().data().decode())['listings']
         return [Listing.from_json(listing) for listing in listings_json]
+
+    def parse_listing_reply(self, reply: QNetworkReply) -> Optional[Listing]:
+        """
+        Parse a listing reply and return as a fully-populated Listing object
+        """
+        if sip.isdeleted(self):
+            return None
+
+        if reply.error() == QNetworkReply.OperationCanceledError:
+            return None
+
+        if reply.error() != QNetworkReply.NoError:
+            self.error_occurred.emit(reply.errorString())
+            return None
+
+        listing_json = json.loads(reply.readAll().data().decode())
+        return Listing.from_json(listing_json)
 
     @staticmethod
     def _to_url_query(parameters: Dict[str, object]) -> QUrlQuery:
