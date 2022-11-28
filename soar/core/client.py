@@ -35,7 +35,10 @@ from qgis.PyQt.QtNetwork import (
 )
 from qgis.core import (
     QgsGeometry,
-    QgsRasterLayer
+    QgsRasterLayer,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsProject
 )
 
 
@@ -190,7 +193,19 @@ class Listing:
         if not layer_uri:
             return None
 
-        return QgsRasterLayer(layer_uri, self.title, 'wms')
+        layer = QgsRasterLayer(layer_uri, self.title, 'wms')
+
+        # force set the layer's extent to what we know the extent will be, because otherwise QGIS
+        # will assume it is global
+        if self.geometry and not self.geometry.isEmpty():
+            transform = QgsCoordinateTransform(
+                QgsCoordinateReferenceSystem('EPSG:4326'),
+                QgsCoordinateReferenceSystem('EPSG:3857'),
+                QgsProject.instance())
+            extent_3857 = transform.transformBoundingBox(self.geometry.boundingBox())
+            layer.setExtent(extent_3857)
+
+        return layer
 
     @staticmethod
     def from_json(input_json: dict) -> 'Listing':  # pylint:disable=too-many-statements
