@@ -66,7 +66,7 @@ class ApiClientTest(unittest.TestCase):
 
     def test_listing_from_json(self):
         """
-        Test creating Listing from JSON
+        Test creating Listing from JSON, using the form returned by the Listings api
         """
         json = {
             "owner": "4515f58126704ae4831ffa9d66c395d7",
@@ -131,9 +131,124 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.updated_at.toUTC(),
                          QDateTime(2022, 11, 22, 21, 42, 36, 0, Qt.TimeSpec(1)))
 
-    def test_listing_request(self):
+    def test_listing_from_json_singular(self):
         """
-        Test building listing requests
+        Test creating Listing from JSON, using the form returned by the Listing api
+        """
+        json = {
+            "tileUrl": "https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1",
+            "metadata": "{\"description\":\"Creative application of Sentinel 2 water quality script and b/w Google satellite imagery\",\"category\":\"satellite\",\"title\":\"Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019\",\"tc\":true,\"tags\":[]}",
+            "previewUrl": "https://short-preview.soar.earth/preview%2Fbrowser%2Fprod%2F4515f58126704ae4831ffa9d66c395d7%40soar%2Fyamchi__8ab6c81cd0d07457796a87da86a7ae38.tif.png",
+            "description": "Creative application of Sentinel 2 water quality script and b/w Google satellite imagery",
+            "listingType": "TILE_LAYER",
+            "filesize": 3894594,
+            "title": "Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019",
+            "createdAt": 1630467763,
+            "price": {
+                "priceUsd": 0,
+                "feeUsd": 0.3,
+                "priceSkym": 0
+            },
+            "id": 10464,
+            "categories": [
+                "environment",
+                "marine"
+            ],
+            "listing": {
+                "owner": "4515f58126704ae4831ffa9d66c395d7",
+                "tileUrl": "https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1",
+                "metadata": "{\"description\":\"Creative application of Sentinel 2 water quality script and b/w Google satellite imagery\",\"category\":\"satellite\",\"title\":\"Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019\",\"tc\":true,\"tags\":[]}",
+                "previewUrl": "https://short-preview.soar.earth/preview%2Fbrowser%2Fprod%2F4515f58126704ae4831ffa9d66c395d7%40soar%2Fyamchi__8ab6c81cd0d07457796a87da86a7ae38.tif.png",
+                "listingType": "TILE_LAYER",
+                "filesize": 3894594,
+                "url": "https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1",
+                "createdAt": 1630467763,
+                "filename": "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif",
+                "price": {
+                    "priceUsd": 0,
+                    "feeUsd": 0.3,
+                    "priceSkym": 0
+                },
+                "pointWKT": "POLYGON((48.10236963 38.07218305,48.03699668 38.07218305,48.03699668 38.03425478,48.10236963 38.03425478,48.10236963 38.07218305))",
+                "uploadedAt": 1630467763,
+                "id": 10464,
+                "filehash": "8ab6c81cd0d07457796a87da86a7ae38",
+                "totalLikes": 9,
+                "geometryWKT": "POLYGON((48.10236963 38.07218305,48.03699668 38.07218305,48.03699668 38.03425478,48.10236963 38.03425478,48.10236963 38.07218305))",
+                "updatedAt": 1666322742
+            },
+            "geometryWKT": "POLYGON((48.10236963 38.07218305,48.03699668 38.07218305,48.03699668 38.03425478,48.10236963 38.03425478,48.10236963 38.07218305))",
+            "updatedAt": 1666322742,
+            "owner": "4515f58126704ae4831ffa9d66c395d7",
+            "avatarUrl": "https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview",
+            "minZoom": 12,
+            "userName": "TheRealDazzler",
+            "userId": "4515f58126704ae4831ffa9d66c395d7",
+            "tags": ['flood', 'emergency'],
+            "filename": "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif",
+            "totalComments": 1,
+            "domainName": "soar.earth",
+            "files": [],
+            "totalViews": 9,
+            "filehash": "8ab6c81cd0d07457796a87da86a7ae38",
+            "totalLikes": 33,
+            "tileUrlExpiryAt": 1669996817,
+            "user": {
+                "createdAt": 1571710337,
+                "avatarUrl": "https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview",
+                "name": "TheRealDazzler",
+                "userId": "4515f58126704ae4831ffa9d66c395d7",
+                "ethAddress": "4515f58126704ae4831ffa9d66c395d7"
+            },
+            "reviewSoar": "APPROVED"
+        }
+
+        listing = Listing.from_json(json)
+        self.assertEqual(listing.owner, '4515f58126704ae4831ffa9d66c395d7')
+        self.assertEqual(listing.metadata, {
+            "description": "Creative application of Sentinel 2 water quality script and b/w Google satellite imagery",
+            "category": "satellite",
+            "title": "Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019",
+            "tc": True,
+            "tags": []})
+        self.assertEqual(listing.preview_url,
+                         'https://short-preview.soar.earth/preview%2Fbrowser%2Fprod%2F4515f58126704ae4831ffa9d66c395d7%40soar%2Fyamchi__8ab6c81cd0d07457796a87da86a7ae38.tif.png')
+        self.assertEqual(listing.user.avatar_url,
+                         'https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview')
+        self.assertEqual(listing.user.name, 'TheRealDazzler')
+        self.assertEqual(listing.user.user_id, '4515f58126704ae4831ffa9d66c395d7')
+        self.assertEqual(listing.description,
+                         'Creative application of Sentinel 2 water quality script and b/w Google satellite imagery')
+        self.assertEqual(listing.min_zoom, 12)
+        self.assertEqual(listing.listing_type, ListingType.TileLayer)
+        self.assertEqual(listing.title,
+                         'Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019')
+        self.assertEqual(listing.tags, ['flood', 'emergency'])
+        self.assertEqual(listing.created_at.toUTC(),
+                         QDateTime(2021, 9, 1, 3, 42, 43, 0, Qt.TimeSpec(1)))
+        self.assertEqual(listing.total_comments, 1)
+        self.assertEqual(listing.filename,
+                         "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif")
+        self.assertEqual(listing.total_views, 9)
+        self.assertEqual(listing.id, 10464)
+        self.assertEqual(listing.filehash, '8ab6c81cd0d07457796a87da86a7ae38')
+        self.assertEqual(listing.total_likes, 33)
+        self.assertEqual(listing.categories, ['environment', 'marine'])
+        self.assertEqual(listing.geometry.asWkt(1),
+                         'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
+        self.assertEqual(listing.updated_at.toUTC(),
+                         QDateTime(2022, 10, 21, 3, 25, 42, 0, Qt.TimeSpec(1)))
+
+        self.assertEqual(listing.tile_url,
+                         'https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1')
+        self.assertEqual(listing.file_size, 3894594)
+        self.assertEqual(listing.domain_name, 'soar.earth')
+        self.assertEqual(listing.tile_url_expiry_at.toUTC(),
+                         QDateTime(2022, 12, 2, 16, 0, 17, 0, Qt.TimeSpec(1)))
+
+    def test_listings_request(self):
+        """
+        Test building listings requests
         """
         client = ApiClient()
 
@@ -168,9 +283,9 @@ class ApiClientTest(unittest.TestCase):
 
     # pylint: disable=attribute-defined-outside-init
 
-    def test_listing_reply(self):
+    def test_listings_reply(self):
         """
-        Test handling listing replies
+        Test handling listings replies
         """
         client = ApiClient()
         query = ListingQuery(limit=2, keywords='flood',
@@ -189,6 +304,42 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(len(self._result), 2)
         self.assertEqual(self._result[0].id, 10465)
         self.assertEqual(self._result[1].id, 10464)
+
+    def test_listing_request(self):
+        """
+        Test building listing requests
+        """
+        client = ApiClient()
+
+        request = client.request_listing(10464)
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings/10464')
+        self.assertEqual(request.rawHeader(b'Subdomain'), b'soar.earth')
+
+        request = client.request_listing(10464, domain='test.earth')
+        self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings/10464')
+
+    def test_listing_reply(self):
+        """
+        Test handling listing replies
+        """
+        client = ApiClient()
+        request = client.request_listing(10464)
+        reply = QgsNetworkAccessManager.instance().get(request)
+        self._result = None
+
+        def finished(_reply):
+            self._result = client.parse_listing_reply(_reply)
+
+        reply.finished.connect(partial(finished, reply))
+        spy = QSignalSpy(reply.finished)
+        spy.wait()
+
+        self.assertIsInstance(self._result, Listing)
+        self.assertEqual(self._result.id, 10464)
+        self.assertEqual(self._result.file_size, 3894594)
 
 
 if __name__ == "__main__":
