@@ -34,7 +34,8 @@ from qgis.PyQt.QtNetwork import (
     QNetworkReply
 )
 from qgis.core import (
-    QgsGeometry
+    QgsGeometry,
+    QgsRasterLayer
 )
 
 
@@ -160,6 +161,36 @@ class Listing:
 
     def __repr__(self):
         return f'<Listing: "{self.title}">'
+
+    def to_qgis_layer_source_string(self) -> Optional[str]:
+        """
+        Returns a qgis layer source string file the listing
+        """
+        source_uri = self.tile_url
+        if not source_uri:
+            return None
+
+        source_uri = source_uri.replace('{y}', '{-y}')
+        source_uri = source_uri.replace('&', '%26')
+        source_uri = source_uri.replace('=', '%3D')
+        source_uri = source_uri.replace('{', '%7B')
+        source_uri = source_uri.replace('}', '%7D')
+
+        layer_uri = f"type=xyz&url={source_uri}"
+        if self.min_zoom is not None:
+            layer_uri += f'&zmin={self.min_zoom}'
+
+        return layer_uri
+
+    def to_qgis_layer(self) -> Optional[QgsRasterLayer]:
+        """
+        Returns a QgsRasterLayer for the listing
+        """
+        layer_uri = self.to_qgis_layer_source_string()
+        if not layer_uri:
+            return None
+
+        return QgsRasterLayer(layer_uri, self.title, 'wms')
 
     @staticmethod
     def from_json(input_json: dict) -> 'Listing':  # pylint:disable=too-many-statements
