@@ -18,7 +18,8 @@ from typing import Optional
 from qgis.PyQt.QtCore import (
     Qt,
     QRect,
-    QSize
+    QSize,
+    pyqtSignal
 )
 from qgis.PyQt.QtWidgets import (
     QLayout,
@@ -228,6 +229,8 @@ class ResponsiveTableWidget(QWidget):
     VERTICAL_SPACING = 10
     HORIZONTAL_SPACING = 10
 
+    listing_clicked = pyqtSignal(Listing)
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -291,6 +294,7 @@ class ResponsiveTableWidget(QWidget):
         Pushes a listing to the table
         """
         listing_widget = ListingItemWidget(listing, self)
+        listing_widget.clicked.connect(self.listing_clicked)
 
         next_empty_widget = self.find_next_empty_widget()
         if next_empty_widget is not None:
