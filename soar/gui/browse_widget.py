@@ -27,7 +27,8 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtNetwork import QNetworkReply
 
 from qgis.core import (
-    QgsNetworkAccessManager
+    QgsNetworkAccessManager,
+    QgsProject
 )
 
 from qgis.gui import (
@@ -120,7 +121,6 @@ class BrowseWidget(QWidget):
 
         layer = listing.to_qgis_layer()
         if layer:
-            from qgis.core import QgsProject
             QgsProject.instance().addMapLayer(layer)
 
     def _listing_reply_finished(self, reply: QNetworkReply):
