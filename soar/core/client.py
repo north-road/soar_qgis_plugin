@@ -170,6 +170,12 @@ class Listing:
     def __repr__(self):
         return f'<Listing: "{self.title}">'
 
+    def permalink(self) -> str:
+        """
+        Returns a permalink for the listing
+        """
+        return f'https://soar.earth/maps/{self.id}'
+
     def to_qgis_layer_source_string(self) -> Optional[str]:
         """
         Returns a qgis layer source string file the listing
@@ -203,6 +209,13 @@ class Listing:
         if self.tags:
             res.addKeywords('tags', self.tags)
         res.setCategories(self.categories)
+
+        link = QgsAbstractMetadataBase.Link()
+        link.name = 'soar.earth'
+        link.type = 'WWW:LINK'
+        link.description = self.title
+        link.url = self.permalink()
+        res.addLink(link)
 
         if self.created_at and self.created_at.isValid():
             try:
