@@ -22,7 +22,8 @@ from qgis.PyQt.QtCore import (
 )
 from qgis.PyQt.QtGui import (
     QImage,
-    QPixmap
+    QPixmap,
+    QTextDocument
 )
 from qgis.PyQt.QtWidgets import (
     QLabel,
@@ -33,10 +34,10 @@ from qgis.gui import (
     QgsPanelWidget
 )
 
+from .thumbnail_manager import download_thumbnail
 from ..core.client import (
     Listing
 )
-from .thumbnail_manager import download_thumbnail
 
 PAGE_SIZE = 20
 
@@ -66,7 +67,16 @@ class ListingDetailsWidget(QgsPanelWidget):
         self.thumbnail_widget.setFixedSize(100, 100)
         layout.addWidget(self.thumbnail_widget)
 
-        description_label = QLabel(self.listing.description)
+        try:
+            description = QTextDocument()
+            description.setMarkdown(self.listing.description)
+            description_html = description.toHtml()
+        except AttributeError:
+            description_html = self.listing.description
+
+        description_label = QLabel(description_html)
+        description_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        description_label.setOpenExternalLinks(True)
         description_label.setWordWrap(True)
         description_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         layout.addWidget(description_label, 1)
