@@ -64,7 +64,7 @@ class ListingDetailsWidget(QgsPanelWidget):
         layout.addWidget(title_label)
 
         credit_label = QLabel()
-        credit_label.setText(self.tr('by {}').format(f'<a href="{self.listing.user.permalink()}">{self.listing.user.name}</a>'))
+        credit_label.setText(self.tr('By {}').format(f'<a href="{self.listing.user.permalink()}">{self.listing.user.name}</a>'))
         credit_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
         credit_label.setOpenExternalLinks(True)
         credit_label.setWordWrap(True)
@@ -76,6 +76,14 @@ class ListingDetailsWidget(QgsPanelWidget):
         link_label.setOpenExternalLinks(True)
         link_label.setWordWrap(True)
         layout.addWidget(link_label)
+
+        created_label = QLabel()
+        created_label.setText(self.tr('Created: {}').format(self.listing.created_at.toString('yyyy-MM-dd')))
+        layout.addWidget(created_label)
+
+        updated_label = QLabel()
+        updated_label.setText(self.tr('Updated: {}').format(self.listing.updated_at.toString('yyyy-MM-dd')))
+        layout.addWidget(updated_label)
 
         self.thumbnail_widget = QLabel()
         self.thumbnail_widget.setFixedSize(100, 100)
