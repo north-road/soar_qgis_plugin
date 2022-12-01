@@ -63,6 +63,20 @@ class ListingDetailsWidget(QgsPanelWidget):
         title_label.setWordWrap(True)
         layout.addWidget(title_label)
 
+        credit_label = QLabel()
+        credit_label.setText(self.tr('by {}').format(f'<a href="{self.listing.user.permalink()}">{self.listing.user.name}</a>'))
+        credit_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        credit_label.setOpenExternalLinks(True)
+        credit_label.setWordWrap(True)
+        layout.addWidget(credit_label)
+
+        link_label = QLabel()
+        link_label.setText(self.tr('View on {}soar.earth{}').format(f'<a href="{self.listing.permalink()}">', '</a>'))
+        link_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        link_label.setOpenExternalLinks(True)
+        link_label.setWordWrap(True)
+        layout.addWidget(link_label)
+
         self.thumbnail_widget = QLabel()
         self.thumbnail_widget.setFixedSize(100, 100)
         layout.addWidget(self.thumbnail_widget)
