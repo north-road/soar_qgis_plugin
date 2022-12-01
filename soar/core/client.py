@@ -35,6 +35,7 @@ from qgis.PyQt.QtNetwork import (
     QNetworkReply
 )
 from qgis.core import (
+    Qgis,
     QgsBox3d,
     QgsGeometry,
     QgsRasterLayer,
@@ -202,6 +203,20 @@ class Listing:
         if self.tags:
             res.addKeywords('tags', self.tags)
         res.setCategories(self.categories)
+
+        if self.created_at and self.created_at.isValid():
+            try:
+                res.setDateTime(Qgis.MetadataDateType.Created, self.created_at)
+                res.setDateTime(Qgis.MetadataDateType.Published, self.created_at)
+            except AttributeError:
+                # requires QGIS 3.30+
+                pass
+        if self.updated_at and self.updated_at.isValid():
+            try:
+                res.setDateTime(Qgis.MetadataDateType.Revised, self.updated_at)
+            except AttributeError:
+                # requires QGIS 3.30+
+                pass
 
         if self.user:
             author = QgsAbstractMetadataBase.Contact()
