@@ -247,6 +247,9 @@ class Listing:
 
         layer = QgsRasterLayer(layer_uri, self.title, 'wms')
 
+        # avoid server load by disabling prefetch preview jobs
+        layer.setCustomProperty('rendering/noPreviewJobs', True)
+
         # force set the layer's extent to what we know the extent will be, because otherwise QGIS
         # will assume it is global
         if self.geometry and not self.geometry.isEmpty():
