@@ -117,6 +117,12 @@ class User:
     def __repr__(self):
         return f'<User: "{self.name}">'
 
+    def permalink(self) -> str:
+        """
+        Returns a permalink for the user
+        """
+        return f'https://soar.earth/profile/{self.user_id}'
+
     @staticmethod
     def from_json(input_json: dict) -> 'User':
         """
@@ -206,15 +212,23 @@ class Listing:
         res.setType('dataset')
         res.setTitle(self.title)
         res.setAbstract(self.description)
+        res.setLanguage('en')
         if self.tags:
             res.addKeywords('tags', self.tags)
         res.setCategories(self.categories)
 
         link = QgsAbstractMetadataBase.Link()
-        link.name = 'soar.earth'
+        link.name = 'Dataset'
         link.type = 'WWW:LINK'
         link.description = self.title
         link.url = self.permalink()
+        res.addLink(link)
+
+        link = QgsAbstractMetadataBase.Link()
+        link.name = 'Author'
+        link.type = 'WWW:LINK'
+        link.description = self.user.name
+        link.url = self.user.permalink()
         res.addLink(link)
 
         if self.created_at and self.created_at.isValid():
