@@ -224,12 +224,13 @@ class Listing:
         link.url = self.permalink()
         res.addLink(link)
 
-        link = QgsAbstractMetadataBase.Link()
-        link.name = 'Author'
-        link.type = 'WWW:LINK'
-        link.description = self.user.name
-        link.url = self.user.permalink()
-        res.addLink(link)
+        if self.user:
+            link = QgsAbstractMetadataBase.Link()
+            link.name = 'Author'
+            link.type = 'WWW:LINK'
+            link.description = self.user.name
+            link.url = self.user.permalink()
+            res.addLink(link)
 
         if self.created_at and self.created_at.isValid():
             try:
