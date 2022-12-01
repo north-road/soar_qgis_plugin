@@ -13,8 +13,16 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
+from typing import Optional
+
 from qgis.PyQt.QtCore import (
-    pyqtSignal
+    Qt,
+    pyqtSignal,
+    QSize
+)
+from qgis.PyQt.QtGui import (
+    QImage,
+    QPixmap
 )
 from qgis.PyQt.QtWidgets import (
     QLabel,
@@ -28,6 +36,7 @@ from qgis.gui import (
 from ..core.client import (
     Listing
 )
+from .thumbnail_manager import download_thumbnail
 
 PAGE_SIZE = 20
 
@@ -48,18 +57,39 @@ class ListingDetailsWidget(QgsPanelWidget):
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
 
-        title_label = QLabel(self.listing.title)
+        title_label = QLabel()
+        title_label.setText(f'<h1>{self.listing.title}</h1>')
+        title_label.setWordWrap(True)
         layout.addWidget(title_label)
+
+        self.thumbnail_widget = QLabel()
+        self.thumbnail_widget.setFixedSize(100, 100)
+        layout.addWidget(self.thumbnail_widget)
 
         description_label = QLabel(self.listing.description)
         description_label.setWordWrap(True)
+        description_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         layout.addWidget(description_label, 1)
 
         add_to_map_button = QPushButton(self.tr('Add to Map'))
         add_to_map_button.clicked.connect(self.add_to_map_clicked)
         layout.addWidget(add_to_map_button)
 
+        if listing.preview_url:
+            download_thumbnail(listing.preview_url, self)
+
         self.setLayout(layout)
+
+    def set_thumbnail(self, img: Optional[QImage]):
+        """
+        Sets the item thumbnail
+        """
+        dpi_ratio = self.screen().devicePixelRatio()
+        width = int(img.width() / dpi_ratio)
+        height = int(img.height() / dpi_ratio)
+
+        self.thumbnail_widget.setFixedSize(QSize(width, height))
+        self.thumbnail_widget.setPixmap(QPixmap.fromImage(img))
 
     def add_to_map_clicked(self):
         """
