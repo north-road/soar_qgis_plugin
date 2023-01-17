@@ -25,7 +25,8 @@ from qgis.PyQt.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
-    QCheckBox
+    QCheckBox,
+    QComboBox
 )
 from qgis.core import (
     QgsNetworkAccessManager,
@@ -61,18 +62,35 @@ class BrowseWidget(QWidget):
 
         self.api_client = ApiClient()
 
-        vl = QVBoxLayout()
-
-        hl = QHBoxLayout()
-        hl.setContentsMargins(0, 0, 0, 0)
-
         self.search_edit = QgsFilterLineEdit()
         self.search_edit.setShowSearchIcon(True)
         self.search_edit.setShowClearButton(True)
         self.search_edit.setPlaceholderText(self.tr('Search'))
         self.search_edit.textChanged.connect(self._filter_widget_changed)
 
-        hl.addWidget(self.search_edit)
+        vl = QVBoxLayout()
+        vl.addWidget(self.search_edit)
+
+        hl = QHBoxLayout()
+        hl.setContentsMargins(0, 0, 0, 0)
+
+        self.category_combo = QComboBox()
+        self.category_combo.addItem(self.tr('All Categories'))
+        self.category_combo.addItem(self.tr('Agriculture'), 'agriculture')
+        self.category_combo.addItem(self.tr('Climate'), 'climate')
+        self.category_combo.addItem(self.tr('Earth Art'), 'earth-art')
+        self.category_combo.addItem(self.tr('Economic'), 'economic')
+        self.category_combo.addItem(self.tr('Geology'), 'geology')
+        self.category_combo.addItem(self.tr('History'), 'history')
+        self.category_combo.addItem(self.tr('Marine'), 'marine')
+        self.category_combo.addItem(self.tr('Political'), 'political')
+        self.category_combo.addItem(self.tr('Terrain'), 'terrain')
+        self.category_combo.addItem(self.tr('Transport'), 'transport')
+        self.category_combo.addItem(self.tr('Urban'), 'urban')
+
+        self.category_combo.currentIndexChanged.connect(self._filter_widget_changed)
+
+        hl.addWidget(self.category_combo, 1)
 
         self.restrict_to_map_extent = QCheckBox(self.tr('Filter by map extent'))
         self.restrict_to_map_extent.toggled.connect(self._filter_widget_changed)
@@ -125,6 +143,10 @@ class BrowseWidget(QWidget):
         Updates the listings
         """
         query = ListingQuery(keywords=self.search_edit.text())
+
+        category = self.category_combo.currentData()
+        if category:
+            query.category = category
 
         if self.restrict_to_map_extent.isChecked():
             target_crs = QgsCoordinateReferenceSystem('EPSG:4326')
