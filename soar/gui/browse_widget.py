@@ -13,22 +13,20 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
-from typing import Optional
 from functools import partial
+from typing import Optional
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
     QTimer
 )
+from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.PyQt.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
-    QGridLayout,
     QCheckBox
 )
-from qgis.PyQt.QtNetwork import QNetworkReply
-
 from qgis.core import (
     QgsNetworkAccessManager,
     QgsProject,
@@ -37,23 +35,20 @@ from qgis.core import (
     QgsGeometry,
     QgsCsException
 )
-
 from qgis.gui import (
     QgsFilterLineEdit,
     QgsPanelWidgetStack
 )
+from qgis.utils import iface
 
-from .listings_browser_widget import ListingsBrowserWidget
 from .listing_details_widget import ListingDetailsWidget
-
+from .listings_browser_widget import ListingsBrowserWidget
 from ..core.client import (
     ApiClient,
     Listing,
     ListingType,
     ListingQuery
 )
-
-from qgis.utils import iface
 
 
 class BrowseWidget(QWidget):
@@ -69,7 +64,7 @@ class BrowseWidget(QWidget):
         vl = QVBoxLayout()
 
         hl = QHBoxLayout()
-        hl.setContentsMargins(0,0,0,0)
+        hl.setContentsMargins(0, 0, 0, 0)
 
         self.search_edit = QgsFilterLineEdit()
         self.search_edit.setShowSearchIcon(True)
@@ -82,7 +77,7 @@ class BrowseWidget(QWidget):
         self.restrict_to_map_extent = QCheckBox(self.tr('Filter by map extent'))
         self.restrict_to_map_extent.toggled.connect(self._filter_widget_changed)
         hl.addWidget(self.restrict_to_map_extent)
-        
+
         vl.addLayout(hl)
 
         self.panel_stack = QgsPanelWidgetStack()
@@ -117,6 +112,9 @@ class BrowseWidget(QWidget):
         self._update_query_timeout.start(500)
 
     def _map_extent_changed(self):
+        """
+        Triggered whenever the map canvas extent is changed
+        """
         if not self.restrict_to_map_extent.isChecked():
             return
 
@@ -131,7 +129,8 @@ class BrowseWidget(QWidget):
         if self.restrict_to_map_extent.isChecked():
             target_crs = QgsCoordinateReferenceSystem('EPSG:4326')
             transform = QgsCoordinateTransform(iface.mapCanvas().mapSettings().destinationCrs(),
-                                               target_crs, QgsProject.instance().transformContext())
+                                               target_crs,
+                                               QgsProject.instance().transformContext())
 
             visible_polygon = iface.mapCanvas().mapSettings().visiblePolygon()
             # close polygon
@@ -170,7 +169,8 @@ class BrowseWidget(QWidget):
 
         if not listing.tile_url:
             # listing does not have tile url, so we need to request it now
-            if self._current_listing_reply is not None and not sip.isdeleted(self._current_listing_reply):
+            if self._current_listing_reply is not None and not sip.isdeleted(
+                    self._current_listing_reply):
                 self._current_listing_reply.abort()
                 self._current_listing_reply = None
 
