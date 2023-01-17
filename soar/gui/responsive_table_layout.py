@@ -199,11 +199,6 @@ class ResponsiveTableLayout(QLayout):
                         QRect(x, y_offset, col_width, item.sizeHint().height())
                     )
 
-                    try:
-                        item.widget().set_column_count(col_count)
-                    except AttributeError:
-                        pass
-
                     x += col_width + space_x
 
         return y + line_height - rect.y() + bottom
