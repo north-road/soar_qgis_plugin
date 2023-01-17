@@ -410,7 +410,8 @@ class ListingQuery:
         if self.featured:
             params['featured'] = self.featured
         if self.aoi and not self.aoi.isEmpty():
-            params['aoi'] = self.aoi.asWkt()
+            # seems SOAR api is sensitive to WKT format! This must be uppercase
+            params['aoi'] = self.aoi.asWkt(4).upper()
         return params
 
 

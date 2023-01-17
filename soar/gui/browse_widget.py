@@ -22,13 +22,20 @@ from qgis.PyQt.QtCore import (
 )
 from qgis.PyQt.QtWidgets import (
     QWidget,
-    QVBoxLayout
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QCheckBox
 )
 from qgis.PyQt.QtNetwork import QNetworkReply
 
 from qgis.core import (
     QgsNetworkAccessManager,
-    QgsProject
+    QgsProject,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsGeometry,
+    QgsCsException
 )
 
 from qgis.gui import (
@@ -46,6 +53,8 @@ from ..core.client import (
     ListingQuery
 )
 
+from qgis.utils import iface
+
 
 class BrowseWidget(QWidget):
     """
@@ -59,13 +68,22 @@ class BrowseWidget(QWidget):
 
         vl = QVBoxLayout()
 
+        hl = QHBoxLayout()
+        hl.setContentsMargins(0,0,0,0)
+
         self.search_edit = QgsFilterLineEdit()
         self.search_edit.setShowSearchIcon(True)
         self.search_edit.setShowClearButton(True)
         self.search_edit.setPlaceholderText(self.tr('Search'))
         self.search_edit.textChanged.connect(self._filter_widget_changed)
 
-        vl.addWidget(self.search_edit)
+        hl.addWidget(self.search_edit)
+
+        self.restrict_to_map_extent = QCheckBox(self.tr('Filter by map extent'))
+        self.restrict_to_map_extent.toggled.connect(self._filter_widget_changed)
+        hl.addWidget(self.restrict_to_map_extent)
+        
+        vl.addLayout(hl)
 
         self.panel_stack = QgsPanelWidgetStack()
 
@@ -86,6 +104,8 @@ class BrowseWidget(QWidget):
         self._update_query_timeout.setSingleShot(True)
         self._update_query_timeout.timeout.connect(self._update_query)
 
+        iface.mapCanvas().extentsChanged.connect(self._map_extent_changed)
+
         self._current_listing_reply: Optional[QNetworkReply] = None
 
     def _filter_widget_changed(self):
@@ -96,11 +116,33 @@ class BrowseWidget(QWidget):
         # starting lots of queries while a user is mid-operation (such as dragging a slider)
         self._update_query_timeout.start(500)
 
+    def _map_extent_changed(self):
+        if not self.restrict_to_map_extent.isChecked():
+            return
+
+        self._filter_widget_changed()
+
     def _update_query(self):
         """
         Updates the listings
         """
         query = ListingQuery(keywords=self.search_edit.text())
+
+        if self.restrict_to_map_extent.isChecked():
+            target_crs = QgsCoordinateReferenceSystem('EPSG:4326')
+            transform = QgsCoordinateTransform(iface.mapCanvas().mapSettings().destinationCrs(),
+                                               target_crs, QgsProject.instance().transformContext())
+
+            visible_polygon = iface.mapCanvas().mapSettings().visiblePolygon()
+            # close polygon
+            visible_polygon.append(visible_polygon.at(0))
+            polygon_map = QgsGeometry.fromQPolygonF(visible_polygon)
+            try:
+                polygon_map.transform(transform)
+                query.aoi = polygon_map
+            except QgsCsException:
+                pass
+
         self.browser.populate(query)
 
     def cancel_active_requests(self):
