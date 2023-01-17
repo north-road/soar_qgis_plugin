@@ -295,11 +295,8 @@ class ApiClientTest(unittest.TestCase):
             'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))
         request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
-                         'https://api.soar.earth/v1/listings?limit=50&listingType=TILE_LAYER&aoi=Polygon '
-                         '((15.81361599999999967 49.50176700000000096, 15.67047099999999915 '
-                         '49.50176700000000096, 15.67047099999999915 49.39756100000000316, '
-                         '15.81361599999999967 49.39756100000000316, 15.81361599999999967 '
-                         '49.50176700000000096))')
+                         'https://api.soar.earth/v1/listings?limit=50&listingType=TILE_LAYER&aoi=POLYGON '
+                         '((15.8136 49.5018, 15.6705 49.5018, 15.6705 49.3976, 15.8136 49.3976, 15.8136 49.5018))')
 
     # pylint: disable=attribute-defined-outside-init
 
