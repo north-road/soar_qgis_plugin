@@ -34,7 +34,10 @@ from qgis.gui import (
     QgsSourceSelectProvider,
 )
 
-from .gui import GuiUtils
+from .gui import (
+    GuiUtils,
+    MapExportDialog
+)
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
 from .core import (
@@ -86,6 +89,7 @@ class SoarPlugin:
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
         self.project_manager = ProjectManager(QgsProject.instance())
+        self.map_dialog = None
 
     # qgis plugin interface
 
@@ -126,6 +130,10 @@ class SoarPlugin:
         self.dock.hide()
 
     def unload(self):
+        if self.map_dialog and not sip.isdeleted(self.map_dialog):
+            self.map_dialog.deleteLater()
+        self.map_dialog = None
+
         if not sip.isdeleted(self.dock):
             self.dock.cancel_active_requests()
             self.iface.removeDockWidget(self.dock)
@@ -165,6 +173,10 @@ class SoarPlugin:
         """
         Exports the current map (project) to soar
         """
+        if self.map_dialog and not sip.isdeleted(self.map_dialog):
+            self.map_dialog.show()
+            return
+
         validator = MapValidator(QgsProject.instance())
         if not validator.validate():
 
@@ -173,3 +185,13 @@ class SoarPlugin:
             dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageHtml)
             dialog.showMessage()
             return
+
+        self.map_dialog = MapExportDialog()
+
+        def dialog_rejected():
+            if not sip.isdeleted(self.map_dialog):
+                self.map_dialog.deleteLater()
+            self.map_dialog = None
+
+        self.map_dialog.rejected.connect(dialog_rejected)
+        self.map_dialog.show()
