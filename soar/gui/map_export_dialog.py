@@ -27,12 +27,14 @@ from qgis.gui import (
     QgsExtentGroupBox,
     QgsScaleWidget,
     QgsSpinBox,
-    QgsRatioLockButton,
-    QgsMessageBar
+    QgsRatioLockButton
 )
 
-from ..core import ProjectManager
 from .gui_utils import GuiUtils
+from ..core import (
+    ProjectManager,
+    MapExportSettings
+)
 
 ui, base = uic.loadUiType(GuiUtils.get_ui_file_path('map_export_dialog.ui'))
 
@@ -145,7 +147,7 @@ class MapExportDialog(base, ui):
         height = self.mOutputHeightSpinBox.value()
 
         scale = height / self.size.height()
-        adjustment = ((self.extent.height() * scale) - self.extent.height() ) / 2
+        adjustment = ((self.extent.height() * scale) - self.extent.height()) / 2
         self.size.setHeight(height)
 
         self.extent.setYMinimum(self.extent.yMinimum() - adjustment)
@@ -256,6 +258,36 @@ class MapExportDialog(base, ui):
 
         return True, ''
 
+    def export_settings(self) -> MapExportSettings:
+        """
+        Returns the export settings defined in the dialog
+        """
+        export_settings = MapExportSettings()
+
+        export_settings.title = self.map_title_edit.text()
+        export_settings.description = self.description_edit.toPlainText()
+        export_settings.tags = self.tags_edit.text().split(';')
+        export_settings.category = self.category_combo.currentData()
+        export_settings.size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
+        export_settings.scale = self.mScaleWidget.scale()
+        export_settings.extent = self.mExtentGroupBox.outputExtent()
+
+        return export_settings
+
+    def save_settings(self):
+        """
+        Saves the dialog's settings
+        """
+        export_settings = self.export_settings()
+
+        self.project_manager.set_soar_map_title(export_settings.title)
+        self.project_manager.set_soar_map_description(export_settings.description)
+        self.project_manager.set_soar_map_tags(export_settings.tags)
+        self.project_manager.set_soar_category(export_settings.category)
+        self.project_manager.set_export_size(export_settings.size)
+        self.project_manager.set_export_scale(export_settings.scale)
+        self.project_manager.set_export_extent(export_settings.extent)
+
     def accept(self):
         self.message_bar.clearWidgets()
 
@@ -264,26 +296,6 @@ class MapExportDialog(base, ui):
             self.message_bar.pushWarning('', error)
             return
 
-        title = self.map_title_edit.text()
-        self.project_manager.set_soar_map_title(title)
-
-        description = self.description_edit.toPlainText()
-        self.project_manager.set_soar_map_description(description)
-
-        tags = self.tags_edit.text().split(';')
-        self.project_manager.set_soar_map_tags(tags)
-
-        category = self.category_combo.currentData()
-        self.project_manager.set_soar_category(category)
-
-        size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
-        self.project_manager.set_export_size(size)
-
-        scale = self.mScaleWidget.scale()
-        self.project_manager.set_export_scale(scale)
-
-        extent = self.mExtentGroupBox.outputExtent()
-        self.project_manager.set_export_extent(extent)
+        self.save_settings()
 
         super().accept()
-

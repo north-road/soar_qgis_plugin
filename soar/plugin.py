@@ -37,7 +37,8 @@ from qgis.gui import (
 
 from .gui import (
     GuiUtils,
-    MapExportDialog
+    MapExportDialog,
+    ConfirmExportDialog
 )
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
@@ -90,7 +91,7 @@ class SoarPlugin:
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
         self.project_manager = ProjectManager(QgsProject.instance())
-        self.map_dialog = None
+        self.map_dialog: Optional[MapExportDialog] = None
 
     # qgis plugin interface
 
@@ -194,5 +195,19 @@ class SoarPlugin:
                 self.map_dialog.deleteLater()
             self.map_dialog = None
 
+        def dialog_accepted():
+            settings = self.map_dialog.export_settings()
+
+            if not sip.isdeleted(self.map_dialog):
+                self.map_dialog.deleteLater()
+            self.map_dialog = None
+
+            confirm_dialog = ConfirmExportDialog()
+            if not confirm_dialog.exec():
+                return
+
+            print(settings)
+
         self.map_dialog.rejected.connect(dialog_rejected)
+        self.map_dialog.accepted.connect(dialog_accepted)
         self.map_dialog.show()
