@@ -20,7 +20,8 @@ from qgis.PyQt.QtCore import (
     Qt,
     QTimer,
     QDateTime,
-    QObject
+    QObject,
+    QSize
 )
 from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.core import (
@@ -210,3 +211,27 @@ class ProjectManager(QObject):
 
         self.project.writeEntry('soar', 'map_category', category)
         self.project.setDirty(True)
+
+    def export_size(self) -> QSize:
+        """
+        Returns the stored export size, if set
+        """
+        width, ok = self.project.readNumEntry('soar', 'export_width')
+        if not ok:
+            return QSize()
+
+        height, ok = self.project.readNumEntry('soar', 'export_height')
+        if not ok:
+            return QSize()
+
+        return QSize(width, height)
+
+    def set_export_size(self, size: QSize):
+        """
+        Sets the size to use for map exports
+        """
+        if size == self.export_size():
+            return
+
+        self.project.writeEntry('soar', 'export_width', size.width())
+        self.project.writeEntry('soar', 'export_height', size.height())
