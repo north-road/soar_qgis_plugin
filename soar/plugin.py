@@ -26,17 +26,21 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.core import (
     QgsProviderRegistry,
-    QgsProject
+    QgsProject,
+    QgsMessageOutput
 )
 from qgis.gui import (
     QgsGui,
-    QgsSourceSelectProvider
+    QgsSourceSelectProvider,
 )
 
 from .gui import GuiUtils
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
-from .core.project_manager import ProjectManager
+from .core import (
+    ProjectManager,
+    MapValidator
+)
 
 
 class SoarSourceSelectProvider(QgsSourceSelectProvider):
@@ -102,6 +106,7 @@ class SoarPlugin:
         self.export_map_action = QAction(self.tr("Export Map to Soar.earth"), self.iface.mainWindow())
         self.export_map_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
         self.export_map_action.setToolTip(self.tr('Exports the current map to Soar.earth'))
+        self.export_map_action.triggered.connect(self.export_map_to_soar)
         try:
             self.iface.addProjectExportAction(self.export_map_action)
         except AttributeError:
@@ -155,3 +160,16 @@ class SoarPlugin:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('Soar', message)
+
+    def export_map_to_soar(self):
+        """
+        Exports the current map (project) to soar
+        """
+        validator = MapValidator(QgsProject.instance())
+        if not validator.validate():
+
+            dialog = QgsMessageOutput.createMessageOutput()
+            dialog.setTitle(self.tr('Export Map to Soar.earth'))
+            dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageHtml)
+            dialog.showMessage()
+            return
