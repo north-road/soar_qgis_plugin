@@ -1,3 +1,20 @@
+# -*- coding: utf-8 -*-
+"""soar.earth API client
+
+.. note:: This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+"""
+
+__author__ = '(C) 2022 by Nyall Dawson'
+__date__ = '22/11/2022'
+__copyright__ = 'Copyright 2022, North Road'
+# This will get replaced with a git SHA1 when you do a git archive
+__revision__ = '$Format:%H$'
+
+from typing import Tuple
+
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import (
     QSize
@@ -10,17 +27,22 @@ from qgis.gui import (
     QgsExtentGroupBox,
     QgsScaleWidget,
     QgsSpinBox,
-    QgsRatioLockButton
+    QgsRatioLockButton,
+    QgsMessageBar
 )
 
+from ..core import ProjectManager
 from .gui_utils import GuiUtils
 
 ui, base = uic.loadUiType(GuiUtils.get_ui_file_path('map_export_dialog.ui'))
 
 
 class MapExportDialog(base, ui):
+    """
+    A dialog for entering properties of a export to soar.earth
+    """
 
-    def __init__(self, map_canvas: QgsMapCanvas, parent=None):
+    def __init__(self, map_canvas: QgsMapCanvas, project_manager: ProjectManager, parent=None):
         super().__init__(parent)
 
         self.setupUi(self)
@@ -28,11 +50,18 @@ class MapExportDialog(base, ui):
         self.setWindowTitle(self.tr('Export Map to Soar.earth'))
 
         self.map_canvas = map_canvas
+        self.project_manager = project_manager
 
         map_settings = self.map_canvas.mapSettings()
         self.extent = map_settings.visibleExtent()
         self.dpi = 96
         self.size = map_settings.outputSize()
+
+        self.map_title_edit.setText(self.project_manager.soar_map_title())
+        self.description_edit.setPlainText(self.project_manager.soar_map_description())
+        self.tags_edit.setText(';'.join(self.project_manager.soar_map_tags()))
+        # todo category
+
 
         # some type hints:
         self.mExtentGroupBox: QgsExtentGroupBox
@@ -179,3 +208,40 @@ class MapExportDialog(base, ui):
         self.mOutputHeightSpinBox.blockSignals(True)
         self.mOutputHeightSpinBox.setValue(self.size.height())
         self.mOutputHeightSpinBox.blockSignals(False)
+
+    def validate(self) -> Tuple[bool, str]:
+        """
+        Validates the dialog settings
+        """
+        title = self.map_title_edit.text()
+        if not title:
+            return False, self.tr('A map title must be entered')
+
+        description = self.description_edit.toPlainText()
+        if not description:
+            return False, self.tr('A map description must be entered')
+
+        tags = self.tags_edit.text()
+        if not tags:
+            return False, self.tr('Map tags must be entered')
+
+        return True, ''
+
+    def accept(self):
+        res, error = self.validate()
+        if not res:
+            self.message_bar.clearWidgets()
+            self.message_bar.pushWarning('', error)
+            return
+
+        title = self.map_title_edit.text()
+        self.project_manager.set_soar_map_title(title)
+
+        description = self.description_edit.toPlainText()
+        self.project_manager.set_soar_map_description(description)
+
+        tags = self.tags_edit.text().split(';')
+        self.project_manager.set_soar_map_tags(tags)
+
+        super().accept()
+

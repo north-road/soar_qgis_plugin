@@ -187,7 +187,7 @@ class SoarPlugin:
             dialog.showMessage()
             return
 
-        self.map_dialog = MapExportDialog(self.iface.mapCanvas())
+        self.map_dialog = MapExportDialog(self.iface.mapCanvas(), self.project_manager)
 
         def dialog_rejected():
             if not sip.isdeleted(self.map_dialog):
