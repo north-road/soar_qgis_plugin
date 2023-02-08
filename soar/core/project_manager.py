@@ -235,3 +235,23 @@ class ProjectManager(QObject):
 
         self.project.writeEntry('soar', 'export_width', size.width())
         self.project.writeEntry('soar', 'export_height', size.height())
+        self.project.setDirty(True)
+
+    def export_scale(self) -> Optional[float]:
+        """
+        Returns the stored export scale, if set
+        """
+        scale, ok = self.project.readDoubleEntry('soar', 'export_scale')
+        if not ok:
+            return None
+        return scale
+
+    def set_export_scale(self, scale: float):
+        """
+        Sets the scale to use for map exports
+        """
+        if scale == self.export_scale():
+            return
+
+        self.project.writeEntryDouble('soar', 'export_scale', scale)
+        self.project.setDirty(True)
