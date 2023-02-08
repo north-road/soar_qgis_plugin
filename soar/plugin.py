@@ -25,6 +25,7 @@ from qgis.PyQt.QtWidgets import (
     QAction
 )
 from qgis.core import (
+    QgsApplication,
     QgsProviderRegistry,
     QgsProject,
     QgsMessageOutput
@@ -44,7 +45,8 @@ from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
 from .core import (
     ProjectManager,
-    MapValidator
+    MapValidator,
+    MapPublisher
 )
 
 
@@ -206,7 +208,10 @@ class SoarPlugin:
             if not confirm_dialog.exec():
                 return
 
-            print(settings)
+            self.task = MapPublisher(settings, self.iface.mapCanvas())
+
+            QgsApplication.taskManager().addTask(self.task)
+
 
         self.map_dialog.rejected.connect(dialog_rejected)
         self.map_dialog.accepted.connect(dialog_accepted)
