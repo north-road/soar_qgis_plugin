@@ -32,6 +32,7 @@ from qgis.core import (
 from qgis.gui import (
     QgsGui,
     QgsSourceSelectProvider,
+    QgisInterface
 )
 
 from .gui import (
@@ -80,8 +81,8 @@ class SoarPlugin:
     Soar.earth plugin
     """
 
-    def __init__(self, iface):
-        self.iface = iface
+    def __init__(self, iface: QgisInterface):
+        self.iface: QgisInterface = iface
 
         self.dock: Optional[BrowserDockWidget] = None
         self.browse_action: Optional[QAction] = None
@@ -186,7 +187,7 @@ class SoarPlugin:
             dialog.showMessage()
             return
 
-        self.map_dialog = MapExportDialog()
+        self.map_dialog = MapExportDialog(self.iface.mapCanvas())
 
         def dialog_rejected():
             if not sip.isdeleted(self.map_dialog):
