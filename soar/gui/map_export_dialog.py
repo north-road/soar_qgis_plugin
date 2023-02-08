@@ -55,7 +55,9 @@ class MapExportDialog(base, ui):
         map_settings = self.map_canvas.mapSettings()
         self.extent = map_settings.visibleExtent()
         self.dpi = 96
-        self.size = map_settings.outputSize()
+        self.size = self.project_manager.export_size()
+        if self.size.isEmpty():
+            self.size = map_settings.outputSize()
 
         self.map_title_edit.setText(self.project_manager.soar_map_title())
         self.description_edit.setPlainText(self.project_manager.soar_map_description())
@@ -249,9 +251,10 @@ class MapExportDialog(base, ui):
         return True, ''
 
     def accept(self):
+        self.message_bar.clearWidgets()
+
         res, error = self.validate()
         if not res:
-            self.message_bar.clearWidgets()
             self.message_bar.pushWarning('', error)
             return
 
@@ -266,6 +269,10 @@ class MapExportDialog(base, ui):
 
         category = self.category_combo.currentData()
         self.project_manager.set_soar_category(category)
+
+        size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
+        self.project_manager.set_export_size(size)
+
 
         super().accept()
 
