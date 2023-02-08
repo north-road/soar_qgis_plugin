@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 from functools import partial
-from typing import List
+from typing import List, Optional
 
 from qgis.PyQt.QtCore import (
     Qt,
@@ -163,4 +163,50 @@ class ProjectManager(QObject):
             return
 
         self.project.writeEntry('soar', 'map_tags', tags)
+        self.project.setDirty(True)
+
+    def soar_category(self) -> Optional[str]:
+        """
+        Returns the soar category for the map
+        """
+        cat, ok = self.project.readEntry('soar', 'map_category')
+        if cat:
+            return cat
+
+        project_metadata_cats = self.project.metadata().categories()
+        # map from qgis (ISO) categories to soar
+        category_map = {
+            'Biota': 'climate',
+            'Boundaries': 'political',
+            'Climatology Meteorology Atmosphere': 'climate',
+            'Economy': 'economic',
+            'Environment': 'climate',
+            'Farming': 'agriculture',
+            'Geoscientific Information': 'geology',
+            'Health': 'political',
+            'Imagery Base Maps Earth Cover': 'earth-art',
+            'Inland Waters': 'marine',
+            'Intelligence Military': 'political',
+            'Location': 'political',
+            'Oceans': 'marine',
+            'Planning Cadastre': 'political',
+            'Society': 'political',
+            'Structure': 'urban',
+            'Transportation': 'transport',
+            'Utilities Communication': 'urban'
+        }
+        for iso_cat, soar_cat in category_map.items():
+            if iso_cat in project_metadata_cats:
+                return soar_cat
+
+        return None
+
+    def set_soar_category(self, category: str):
+        """
+        Sets the map category to use when exporting the project to soar.earth
+        """
+        if category == self.soar_category():
+            return
+
+        self.project.writeEntry('soar', 'map_category', category)
         self.project.setDirty(True)
