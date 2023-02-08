@@ -78,6 +78,7 @@ class SoarPlugin:
 
         self.dock: Optional[BrowserDockWidget] = None
         self.browse_action: Optional[QAction] = None
+        self.export_map_action: Optional[QAction] = None
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
         self.project_manager = ProjectManager(QgsProject.instance())
@@ -98,6 +99,22 @@ class SoarPlugin:
 
         self.iface.pluginToolBar().addAction(self.browse_action)
 
+        self.export_map_action = QAction(self.tr("Export Map to Soar.earth"), self.iface.mainWindow())
+        self.export_map_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
+        self.export_map_action.setToolTip(self.tr('Exports the current map to Soar.earth'))
+        try:
+            self.iface.addProjectExportAction(self.export_map_action)
+        except AttributeError:
+            # addProjectExportAction was added in QGIS 3.30
+            import_export_menu = GuiUtils.get_project_import_export_menu()
+            if import_export_menu:
+                # find nice insertion point
+                export_separator = [a for a in import_export_menu.actions() if a.isSeparator()]
+                if export_separator:
+                    import_export_menu.insertAction(export_separator[0], self.export_map_action)
+                else:
+                    import_export_menu.addAction(self.export_map_action)
+
         self.source_select_provider = SoarSourceSelectProvider()
         QgsGui.sourceSelectProviderRegistry().addProvider(self.source_select_provider)
 
@@ -110,9 +127,11 @@ class SoarPlugin:
             self.dock.deleteLater()
         self.dock = None
 
-        if not sip.isdeleted(self.browse_action):
-            self.browse_action.deleteLater()
+        for action in (self.browse_action, self.export_map_action):
+            if not sip.isdeleted(action):
+                action.deleteLater()
         self.browse_action = None
+        self.export_map_action = None
 
         if self.source_select_provider and not sip.isdeleted(self.source_select_provider):
             QgsGui.sourceSelectProviderRegistry().removeProvider(self.source_select_provider)
