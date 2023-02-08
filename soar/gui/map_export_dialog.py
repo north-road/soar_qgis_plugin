@@ -94,7 +94,10 @@ class MapExportDialog(base, ui):
         self.mExtentGroupBox.setOutputExtentFromCurrent()
         self.mExtentGroupBox.setMapCanvas(self.map_canvas)
 
-        self.mScaleWidget.setScale(map_settings.scale())
+        scale = self.project_manager.export_scale()
+        if not scale:
+            scale = map_settings.scale()
+        self.mScaleWidget.setScale(scale)
         self.mScaleWidget.setMapCanvas(self.map_canvas)
         self.mScaleWidget.setShowCurrentScaleButton(True)
 
@@ -272,6 +275,9 @@ class MapExportDialog(base, ui):
 
         size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
         self.project_manager.set_export_size(size)
+
+        scale = self.mScaleWidget.scale()
+        self.project_manager.set_export_scale(scale)
 
 
         super().accept()
