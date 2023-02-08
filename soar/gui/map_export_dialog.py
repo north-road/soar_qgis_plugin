@@ -60,8 +60,25 @@ class MapExportDialog(base, ui):
         self.map_title_edit.setText(self.project_manager.soar_map_title())
         self.description_edit.setPlainText(self.project_manager.soar_map_description())
         self.tags_edit.setText(';'.join(self.project_manager.soar_map_tags()))
-        # todo category
 
+        self.category_combo.addItem('')
+        self.category_combo.addItem(self.tr('Agriculture'), 'agriculture')
+        self.category_combo.addItem(self.tr('Climate'), 'climate')
+        self.category_combo.addItem(self.tr('Earth Art'), 'earth-art')
+        self.category_combo.addItem(self.tr('Economic'), 'economic')
+        self.category_combo.addItem(self.tr('Geology'), 'geology')
+        self.category_combo.addItem(self.tr('History'), 'history')
+        self.category_combo.addItem(self.tr('Marine'), 'marine')
+        self.category_combo.addItem(self.tr('Political'), 'political')
+        self.category_combo.addItem(self.tr('Terrain'), 'terrain')
+        self.category_combo.addItem(self.tr('Transport'), 'transport')
+        self.category_combo.addItem(self.tr('Urban'), 'urban')
+
+        project_category = self.project_manager.soar_category()
+        if project_category:
+            self.category_combo.setCurrentIndex(self.category_combo.findData(project_category))
+        else:
+            self.category_combo.setCurrentIndex(0)
 
         # some type hints:
         self.mExtentGroupBox: QgsExtentGroupBox
@@ -225,6 +242,10 @@ class MapExportDialog(base, ui):
         if not tags:
             return False, self.tr('Map tags must be entered')
 
+        category = self.category_combo.currentData()
+        if not category:
+            return False, self.tr('A category must be selected')
+
         return True, ''
 
     def accept(self):
@@ -242,6 +263,9 @@ class MapExportDialog(base, ui):
 
         tags = self.tags_edit.text().split(';')
         self.project_manager.set_soar_map_tags(tags)
+
+        category = self.category_combo.currentData()
+        self.project_manager.set_soar_category(category)
 
         super().accept()
 
