@@ -27,7 +27,8 @@ from qgis.PyQt.QtNetwork import QNetworkReply
 from qgis.core import (
     QgsProject,
     QgsNetworkAccessManager,
-    QgsMapLayer
+    QgsMapLayer,
+    QgsRectangle
 )
 
 from .client import ApiClient
@@ -254,4 +255,40 @@ class ProjectManager(QObject):
             return
 
         self.project.writeEntryDouble('soar', 'export_scale', scale)
+        self.project.setDirty(True)
+
+    def export_extent(self) -> Optional[QgsRectangle]:
+        """
+        Returns the export extent, if set
+        """
+
+        x_min, ok = self.project.readDoubleEntry('soar', 'export_x_min')
+        if not ok:
+            return None
+
+        y_min, ok = self.project.readDoubleEntry('soar', 'export_y_min')
+        if not ok:
+            return None
+
+        x_max, ok = self.project.readDoubleEntry('soar', 'export_x_max')
+        if not ok:
+            return None
+
+        y_max, ok = self.project.readDoubleEntry('soar', 'export_y_max')
+        if not ok:
+            return None
+
+        return QgsRectangle(x_min, y_min, x_max, y_max)
+
+    def set_export_extent(self, extent: QgsRectangle):
+        """
+        Sets the stored map export extent
+        """
+        if extent == self.export_extent():
+            return
+
+        self.project.writeEntryDouble('soar', 'export_x_min', extent.xMinimum())
+        self.project.writeEntryDouble('soar', 'export_y_min', extent.yMinimum())
+        self.project.writeEntryDouble('soar', 'export_x_max', extent.xMaximum())
+        self.project.writeEntryDouble('soar', 'export_y_max', extent.yMaximum())
         self.project.setDirty(True)
