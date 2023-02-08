@@ -14,6 +14,7 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 from functools import partial
+from typing import List
 
 from qgis.PyQt.QtCore import (
     Qt,
@@ -97,3 +98,69 @@ class ProjectManager(QObject):
 
         layer.setCustomProperty('_soar_layer_expiry',
                                 full_listing.tile_url_expiry_at.toString(Qt.ISODate))
+
+    def soar_map_title(self) -> str:
+        """
+        Returns the map title to use when exporting the project to soar.earth
+        """
+        title, ok = self.project.readEntry('soar', 'map_title')
+        if title:
+            return title
+
+        return self.project.metadata().title()
+
+    def set_soar_map_title(self, title: str):
+        """
+        Sets the map title to use when exporting the project to soar.earth
+        """
+        if title == self.soar_map_title():
+            return
+
+        self.project.writeEntry('soar', 'map_title', title)
+        self.project.setDirty(True)
+
+    def soar_map_description(self) -> str:
+        """
+        Returns the map description to use when exporting the project to soar.earth
+        """
+        description, ok = self.project.readEntry('soar', 'map_description')
+        if description:
+            return description
+
+        return self.project.metadata().abstract()
+
+    def set_soar_map_description(self, description: str):
+        """
+        Sets the map description to use when exporting the project to soar.earth
+        """
+        if description == self.soar_map_description():
+            return
+
+        self.project.writeEntry('soar', 'map_description', description)
+        self.project.setDirty(True)
+
+    def soar_map_tags(self) -> List[str]:
+        """
+        Returns the map tags to use when exporting the project to soar.earth
+        """
+        tags, ok = self.project.readListEntry('soar', 'map_tags')
+        if tags:
+            return tags
+
+        tags = set()
+        keywords = self.project.metadata().keywords()
+        for _, words in keywords.items():
+            for word in words:
+                tags.add(word)
+
+        return list(tags)
+
+    def set_soar_map_tags(self, tags: List[str]):
+        """
+        Sets the map tags to use when exporting the project to soar.earth
+        """
+        if set(tags) == set(self.soar_map_tags()):
+            return
+
+        self.project.writeEntry('soar', 'map_tags', tags)
+        self.project.setDirty(True)
