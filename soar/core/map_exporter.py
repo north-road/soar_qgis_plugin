@@ -13,8 +13,11 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
+import tempfile
+from pathlib import Path
 from typing import List
 
+from osgeo import gdal
 from qgis.PyQt.QtCore import (
     QSize
 )
@@ -27,7 +30,8 @@ from qgis.core import (
     QgsExpressionContext,
     QgsExpressionContextUtils,
     QgsMapRendererTask,
-    QgsTask
+    QgsTask,
+    QgsMapSettingsUtils
 )
 from qgis.gui import (
     QgsMapCanvas
@@ -86,7 +90,8 @@ class MapExportSettings:
 
         expression_context = QgsExpressionContext()
         expression_context.appendScope(QgsExpressionContextUtils.globalScope())
-        expression_context.appendScope(QgsExpressionContextUtils.projectScope(QgsProject.instance()))
+        expression_context.appendScope(
+            QgsExpressionContextUtils.projectScope(QgsProject.instance()))
         expression_context.appendScope(QgsExpressionContextUtils.mapSettingsScope(ms))
 
         ms.setExpressionContext(expression_context)
@@ -106,9 +111,38 @@ class MapPublisher(QgsTask):
         self.settings = settings
         self.map_settings = self.settings.map_settings(canvas)
 
-        self.addSubTask(QgsMapRendererTask(self.map_settings,'/home/nyall/test.png'), subTaskDependency=QgsTask.ParentDependsOnSubTask)
+        self.temp_dir = tempfile.TemporaryDirectory()
+        temp_path = Path(self.temp_dir.name)
+        self.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
+
+        self.addSubTask(
+            QgsMapRendererTask(self.map_settings, self.output_file_name, fileFormat='TIF'),
+            subTaskDependency=QgsTask.ParentDependsOnSubTask
+        )
+
+    def cleanup(self):
+        self.temp_dir.cleanup()
+        self.temp_dir = None
 
     def run(self) -> bool:
-        print('ok done, ready for upload')
+        self.georeference_output()
 
+        self.cleanup()
         return True
+
+    def georeference_output(self):
+        """
+        Applies georeferencing to the output image
+        """
+        a, b, c, d, e, f = QgsMapSettingsUtils.worldFileParameters(self.map_settings)
+        c -= 0.5 * a
+        c -= 0.5 * b
+        f -= 0.5 * d
+        f -= 0.5 * e
+
+        dst_ds = gdal.Open(self.output_file_name, gdal.GA_Update)
+        dst_ds.SetGeoTransform([c, a, b, f, d, e])
+        dst_ds.SetProjection(QgsCoordinateReferenceSystem('EPSG:3857').toWkt(
+            QgsCoordinateReferenceSystem.WKT_PREFERRED_GDAL))
+
+        del dst_ds
