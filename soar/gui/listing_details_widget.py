@@ -23,7 +23,8 @@ from qgis.PyQt.QtCore import (
 from qgis.PyQt.QtGui import (
     QImage,
     QPixmap,
-    QTextDocument
+    QTextDocument,
+    QFontMetrics
 )
 from qgis.PyQt.QtWidgets import (
     QLabel,
@@ -101,11 +102,15 @@ class ListingDetailsWidget(QgsPanelWidget):
         description_label.setOpenExternalLinks(True)
         description_label.setWordWrap(True)
         description_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        layout.addWidget(description_label, 1)
+        layout.addWidget(description_label)
+
+        layout.addSpacing(QFontMetrics(self.font()).height() * 2)
 
         add_to_map_button = QPushButton(self.tr('Add to Map'))
         add_to_map_button.clicked.connect(self.add_to_map_clicked)
         layout.addWidget(add_to_map_button)
+
+        layout.addStretch()
 
         if listing.preview_url:
             download_thumbnail(listing.preview_url, self)
