@@ -53,7 +53,10 @@ class MapExportDialog(base, ui):
         self.project_manager = project_manager
 
         map_settings = self.map_canvas.mapSettings()
-        self.extent = map_settings.visibleExtent()
+        self.extent = self.project_manager.export_extent()
+        if not self.extent:
+            self.extent = map_settings.visibleExtent()
+
         self.dpi = 96
         self.size = self.project_manager.export_size()
         if self.size.isEmpty():
@@ -279,6 +282,8 @@ class MapExportDialog(base, ui):
         scale = self.mScaleWidget.scale()
         self.project_manager.set_export_scale(scale)
 
+        extent = self.mExtentGroupBox.outputExtent()
+        self.project_manager.set_export_extent(extent)
 
         super().accept()
 
