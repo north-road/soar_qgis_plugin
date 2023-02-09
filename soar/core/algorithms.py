@@ -178,7 +178,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
             loop.exec()
 
             if not LOGIN_MANAGER.is_logged_in():
-                return False
+                raise QgsProcessingException('Login to soar.earth failed')
 
         input_layer = self.parameterAsRasterLayer(parameters, self.INPUT, context)
 
