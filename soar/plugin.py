@@ -41,7 +41,8 @@ from qgis.gui import (
 from .core import (
     ProjectManager,
     MapValidator,
-    MapPublisher
+    MapPublisher,
+    SoarEarthProvider
 )
 from .gui import (
     GuiUtils,
@@ -100,11 +101,15 @@ class SoarPlugin:
         self.project_manager = ProjectManager(QgsProject.instance())
         self.map_dialog: Optional[MapExportDialog] = None
 
+        self.provider = SoarEarthProvider()
+
     # qgis plugin interface
 
     # pylint: disable=missing-function-docstring
 
     def initGui(self):
+        self.initProcessing()
+
         self.dock = BrowserDockWidget()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
 
@@ -139,7 +144,14 @@ class SoarPlugin:
 
         self.dock.hide()
 
+    def initProcessing(self):
+        """Create the Processing provider"""
+        QgsApplication.processingRegistry().addProvider(self.provider)
+
     def unload(self):
+        QgsApplication.processingRegistry().removeProvider(self.provider)
+        self.provider = None
+
         if self.map_dialog and not sip.isdeleted(self.map_dialog):
             self.map_dialog.deleteLater()
         self.map_dialog = None

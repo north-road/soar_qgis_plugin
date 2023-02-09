@@ -10,3 +10,4 @@ from .map_exporter import (
     MapExportSettings,
     MapPublisher
 )
+from .provider import SoarEarthProvider
