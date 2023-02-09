@@ -43,7 +43,8 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsProject,
     QgsLayerMetadata,
-    QgsAbstractMetadataBase
+    QgsAbstractMetadataBase,
+    QgsNetworkAccessManager
 )
 
 
@@ -422,8 +423,11 @@ class ApiClient(QObject):
 
     URL = "https://api.soar.earth/v1"
     LISTINGS_ENDPOINT = 'listings'
+    LOGIN_ENDPOINT = 'user/login'
 
     error_occurred = pyqtSignal(str)
+    login_error_occurred = pyqtSignal(str)
+    fetched_token = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -432,6 +436,59 @@ class ApiClient(QObject):
             'Subdomain': 'soar.earth',
             'accept': 'application/json'
         }
+
+        self.login_reply: Optional[QNetworkReply] = None
+
+    def login(self, username: str, password: str, domain: str = 'soar.earth'):
+        """
+        Logins and authorizes a user
+        """
+        if self.login_reply:
+            return
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        if domain:
+            headers['Subdomain'] = domain
+
+        params = {
+            'email': username,
+            'password': password
+        }
+        login_request = self._build_request(self.LOGIN_ENDPOINT, headers)
+
+        self.login_reply = QgsNetworkAccessManager.instance().post(login_request, json.dumps(params).encode())
+        self.login_reply.finished.connect(self._login_finished)
+
+    def _login_finished(self):
+        if sip.isdeleted(self):
+            return []
+
+        if not self.login_reply or sip.isdeleted(self.login_reply):
+            self.login_reply = None
+            return
+
+        reply = self.login_reply
+        self.login_reply = None
+
+        if reply.error() == QNetworkReply.OperationCanceledError:
+            self.login_error_occurred.emit('Login canceled')
+            return
+
+        if reply.error() != QNetworkReply.NoError:
+            reply_json = json.loads(reply.readAll().data().decode())
+
+            error = reply_json.get('error')
+            if not error:
+                error = reply.errorString()
+
+            self.login_error_occurred.emit(error)
+            return
+
+        reply_json = json.loads(reply.readAll().data().decode())
+        self.id_token = reply_json['idToken']
+        self.fetched_token.emit()
 
     def request_listings(self,
                          query: ListingQuery,
@@ -537,3 +594,6 @@ class ApiClient(QObject):
             network_request.setRawHeader(header.encode(), value.encode())
 
         return network_request
+
+
+API_CLIENT = ApiClient()

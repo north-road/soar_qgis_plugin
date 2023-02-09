@@ -45,7 +45,7 @@ from qgis.utils import iface
 from .listing_details_widget import ListingDetailsWidget
 from .listings_browser_widget import ListingsBrowserWidget
 from ..core.client import (
-    ApiClient,
+    API_CLIENT,
     Listing,
     ListingType,
     ListingQuery
@@ -59,8 +59,6 @@ class BrowseWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-
-        self.api_client = ApiClient()
 
         self.search_edit = QgsFilterLineEdit()
         self.search_edit.setShowSearchIcon(True)
@@ -196,7 +194,7 @@ class BrowseWidget(QWidget):
                 self._current_listing_reply.abort()
                 self._current_listing_reply = None
 
-            request = self.api_client.request_listing(listing.id)
+            request = API_CLIENT.request_listing(listing.id)
             self._current_listing_reply = QgsNetworkAccessManager.instance().get(request)
             self._current_listing_reply.finished.connect(
                 partial(self._listing_reply_finished, self._current_listing_reply))
@@ -226,5 +224,5 @@ class BrowseWidget(QWidget):
             print('error occurred :(')
             return
 
-        listing = self.api_client.parse_listing_reply(reply)
+        listing = API_CLIENT.parse_listing_reply(reply)
         self._add_listing_to_map(listing)
