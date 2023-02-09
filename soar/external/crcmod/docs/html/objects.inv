@@ -1,0 +1,21 @@
+# Sphinx inventory version 1
+# Project: crcmod
+# Version: 1.7
+crcmod mod crcmod.html
+crcmod.predefined mod crcmod.predefined.html
+crcmod.Crc.generateCode method crcmod.html
+crcmod.Crc.crcValue attribute crcmod.html
+crcmod.predefined.mkPredefinedCrcFun function crcmod.predefined.html
+crcmod.Crc class crcmod.html
+crcmod.mkCrcFun function crcmod.html
+crcmod.Crc.digest_size attribute crcmod.html
+crcmod.predefined.PredefinedCrc class crcmod.predefined.html
+crcmod.predefined..crc_function function crcmod.predefined.html
+crcmod.predefined.mkCrcFun function crcmod.predefined.html
+crcmod.Crc.digest method crcmod.html
+crcmod.Crc.new method crcmod.html
+crcmod.predefined.Crc class crcmod.predefined.html
+crcmod.Crc.copy method crcmod.html
+crcmod..crc_function function crcmod.html
+crcmod.Crc.update method crcmod.html
+crcmod.Crc.hexdigest method crcmod.html

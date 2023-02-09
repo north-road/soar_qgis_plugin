@@ -22,7 +22,7 @@ import time
 import errno
 
 import binascii
-from ...external import crcmod
+from . import crcmod
 import re
 import sys
 import random

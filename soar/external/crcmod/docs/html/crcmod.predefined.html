@@ -1,0 +1,567 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>crcmod.predefined – CRC calculation using predefined algorithms &mdash; crcmod v1.7 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="crcmod v1.7 documentation" href="index.html" />
+    <link rel="prev" title="crcmod – CRC calculation" href="crcmod.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="crcmod.html" title="crcmod – CRC calculation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">crcmod v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-crcmod.predefined">
+<h1><tt class="xref docutils literal"><span class="pre">crcmod.predefined</span></tt> &#8211; CRC calculation using predefined algorithms<a class="headerlink" href="#module-crcmod.predefined" title="Permalink to this headline">¶</a></h1>
+<p>This module provides a function factory <a title="crcmod.predefined.mkPredefinedCrcFun" class="reference internal" href="#crcmod.predefined.mkPredefinedCrcFun"><tt class="xref docutils literal"><span class="pre">mkPredefinedCrcFun()</span></tt></a> and a class <a title="crcmod.predefined.PredefinedCrc" class="reference internal" href="#crcmod.predefined.PredefinedCrc"><tt class="xref docutils literal"><span class="pre">PredefinedCrc</span></tt></a>
+for calculating CRCs of byte strings using common predefined CRC algorithms.</p>
+<p>The function factory and the class are very similar to those defined in <a title="CRC calculation" class="reference external" href="crcmod.html#module-crcmod"><tt class="xref docutils literal"><span class="pre">crcmod</span></tt></a>,
+except that the CRC algorithm is specified by a predefined name, rather than the
+individual polynomial, reflection, and initial and final-XOR parameters.</p>
+<div class="section" id="predefined-crc-algorithms">
+<h2>Predefined CRC algorithms<a class="headerlink" href="#predefined-crc-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="xref docutils literal"><span class="pre">crcmod.predefined</span></tt> module offers the following predefined algorithms:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="18%" />
+<col width="8%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Name</th>
+<th class="head">Polynomial</th>
+<th class="head">Reversed?</th>
+<th class="head">Init-value</th>
+<th class="head">XOR-out</th>
+<th class="head">Check</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td><tt class="docutils literal"><span class="pre">crc-8</span></tt></td>
+<td>0x107</td>
+<td>False</td>
+<td>0x00</td>
+<td>0x00</td>
+<td>0xF4</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-darc</span></tt></td>
+<td>0x139</td>
+<td>True</td>
+<td>0x00</td>
+<td>0x00</td>
+<td>0x15</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-i-code</span></tt></td>
+<td>0x11D</td>
+<td>False</td>
+<td>0xFD</td>
+<td>0x00</td>
+<td>0x7E</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-itu</span></tt></td>
+<td>0x107</td>
+<td>False</td>
+<td>0x55</td>
+<td>0x55</td>
+<td>0xA1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-maxim</span></tt></td>
+<td>0x131</td>
+<td>True</td>
+<td>0x00</td>
+<td>0x00</td>
+<td>0xA1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-rohc</span></tt></td>
+<td>0x107</td>
+<td>True</td>
+<td>0xFF</td>
+<td>0x00</td>
+<td>0xD0</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-8-wcdma</span></tt></td>
+<td>0x19B</td>
+<td>True</td>
+<td>0x00</td>
+<td>0x00</td>
+<td>0x25</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16</span></tt></td>
+<td>0x18005</td>
+<td>True</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0xBB3D</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-buypass</span></tt></td>
+<td>0x18005</td>
+<td>False</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0xFEE8</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-dds-110</span></tt></td>
+<td>0x18005</td>
+<td>False</td>
+<td>0x800D</td>
+<td>0x0000</td>
+<td>0x9ECF</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-dect</span></tt></td>
+<td>0x10589</td>
+<td>False</td>
+<td>0x0001</td>
+<td>0x0001</td>
+<td>0x007E</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-dnp</span></tt></td>
+<td>0x13D65</td>
+<td>True</td>
+<td>0xFFFF</td>
+<td>0xFFFF</td>
+<td>0xEA82</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-en-13757</span></tt></td>
+<td>0x13D65</td>
+<td>False</td>
+<td>0xFFFF</td>
+<td>0xFFFF</td>
+<td>0xC2B7</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-genibus</span></tt></td>
+<td>0x11021</td>
+<td>False</td>
+<td>0x0000</td>
+<td>0xFFFF</td>
+<td>0xD64E</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-maxim</span></tt></td>
+<td>0x18005</td>
+<td>True</td>
+<td>0xFFFF</td>
+<td>0xFFFF</td>
+<td>0x44C2</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-mcrf4xx</span></tt></td>
+<td>0x11021</td>
+<td>True</td>
+<td>0xFFFF</td>
+<td>0x0000</td>
+<td>0x6F91</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-riello</span></tt></td>
+<td>0x11021</td>
+<td>True</td>
+<td>0x554D</td>
+<td>0x0000</td>
+<td>0x63D0</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-t10-dif</span></tt></td>
+<td>0x18BB7</td>
+<td>False</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0xD0DB</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-teledisk</span></tt></td>
+<td>0x1A097</td>
+<td>False</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0x0FB3</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-16-usb</span></tt></td>
+<td>0x18005</td>
+<td>True</td>
+<td>0x0000</td>
+<td>0xFFFF</td>
+<td>0xB4C8</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">x-25</span></tt></td>
+<td>0x11021</td>
+<td>True</td>
+<td>0x0000</td>
+<td>0xFFFF</td>
+<td>0x906E</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">xmodem</span></tt></td>
+<td>0x11021</td>
+<td>False</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0x31C3</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">modbus</span></tt></td>
+<td>0x18005</td>
+<td>True</td>
+<td>0xFFFF</td>
+<td>0x0000</td>
+<td>0x4B37</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">kermit</span></tt> <a class="footnote-reference" href="#ccitt" id="id1">[1]</a></td>
+<td>0x11021</td>
+<td>True</td>
+<td>0x0000</td>
+<td>0x0000</td>
+<td>0x2189</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-ccitt-false</span></tt> <a class="footnote-reference" href="#ccitt" id="id2">[1]</a></td>
+<td>0x11021</td>
+<td>False</td>
+<td>0xFFFF</td>
+<td>0x0000</td>
+<td>0x29B1</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-aug-ccitt</span></tt> <a class="footnote-reference" href="#ccitt" id="id3">[1]</a></td>
+<td>0x11021</td>
+<td>False</td>
+<td>0x1D0F</td>
+<td>0x0000</td>
+<td>0xE5CC</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-24</span></tt></td>
+<td>0x1864CFB</td>
+<td>False</td>
+<td>0xB704CE</td>
+<td>0x000000</td>
+<td>0x21CF02</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-24-flexray-a</span></tt></td>
+<td>0x15D6DCB</td>
+<td>False</td>
+<td>0xFEDCBA</td>
+<td>0x000000</td>
+<td>0x7979BD</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-24-flexray-b</span></tt></td>
+<td>0x15D6DCB</td>
+<td>False</td>
+<td>0xABCDEF</td>
+<td>0x000000</td>
+<td>0x1F23B8</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32</span></tt></td>
+<td>0x104C11DB7</td>
+<td>True</td>
+<td>0x00000000</td>
+<td>0xFFFFFFFF</td>
+<td>0xCBF43926</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32-bzip2</span></tt></td>
+<td>0x104C11DB7</td>
+<td>False</td>
+<td>0x00000000</td>
+<td>0xFFFFFFFF</td>
+<td>0xFC891918</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32c</span></tt></td>
+<td>0x11EDC6F41</td>
+<td>True</td>
+<td>0x00000000</td>
+<td>0xFFFFFFFF</td>
+<td>0xE3069283</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32d</span></tt></td>
+<td>0x1A833982B</td>
+<td>True</td>
+<td>0x00000000</td>
+<td>0xFFFFFFFF</td>
+<td>0x87315576</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32-mpeg</span></tt></td>
+<td>0x104C11DB7</td>
+<td>False</td>
+<td>0xFFFFFFFF</td>
+<td>0x00000000</td>
+<td>0x0376E6E7</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">posix</span></tt></td>
+<td>0x104C11DB7</td>
+<td>False</td>
+<td>0xFFFFFFFF</td>
+<td>0xFFFFFFFF</td>
+<td>0x765E7680</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-32q</span></tt></td>
+<td>0x1814141AB</td>
+<td>False</td>
+<td>0x00000000</td>
+<td>0x00000000</td>
+<td>0x3010BF7F</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">jamcrc</span></tt></td>
+<td>0x104C11DB7</td>
+<td>True</td>
+<td>0xFFFFFFFF</td>
+<td>0x00000000</td>
+<td>0x340BC6D9</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">xfer</span></tt></td>
+<td>0x1000000AF</td>
+<td>False</td>
+<td>0x00000000</td>
+<td>0x00000000</td>
+<td>0xBD0BE338</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-64</span></tt></td>
+<td>0x1000000000000001B</td>
+<td>True</td>
+<td>0x0000000000000000</td>
+<td>0x0000000000000000</td>
+<td>0x46A5A9388A5BEFFE</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-64-we</span></tt></td>
+<td>0x142F0E1EBA9EA3693</td>
+<td>False</td>
+<td>0x0000000000000000</td>
+<td>0xFFFFFFFFFFFFFFFF</td>
+<td>0x62EC59E3F1A4F00A</td>
+</tr>
+<tr><td><tt class="docutils literal"><span class="pre">crc-64-jones</span></tt></td>
+<td>0x1AD93D23594C935A9</td>
+<td>True</td>
+<td>0xFFFFFFFFFFFFFFFF</td>
+<td>0x0000000000000000</td>
+<td>0xCAA717168609F281</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<table class="docutils footnote" frame="void" id="ccitt" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>, <a class="fn-backref" href="#id3">3</a>)</em> <p>Definitions of CCITT are disputable. See:</p>
+<ul class="last simple">
+<li><a class="reference external" href="http://homepages.tesco.net/~rainstorm/crc-catalogue.htm">http://homepages.tesco.net/~rainstorm/crc-catalogue.htm</a></li>
+<li><a class="reference external" href="http://web.archive.org/web/20071229021252/http://www.joegeluso.com/software/articles/ccitt.htm">http://web.archive.org/web/20071229021252/http://www.joegeluso.com/software/articles/ccitt.htm</a></li>
+</ul>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="mkpredefinedcrcfun-crc-function-factory">
+<h2><a title="crcmod.predefined.mkPredefinedCrcFun" class="reference internal" href="#crcmod.predefined.mkPredefinedCrcFun"><tt class="xref docutils literal"><span class="pre">mkPredefinedCrcFun()</span></tt></a> &#8211; CRC function factory<a class="headerlink" href="#mkpredefinedcrcfun-crc-function-factory" title="Permalink to this headline">¶</a></h2>
+<p>The function factory provides a simple interface for CRC calculation. It is similar
+to <a title="crcmod.mkCrcFun" class="reference external" href="crcmod.html#crcmod.mkCrcFun"><tt class="xref docutils literal"><span class="pre">crcmod.mkCrcFun()</span></tt></a>, except that it specifies a CRC algorithm by name rather
+than its parameters.</p>
+<dl class="function">
+<dt id="crcmod.predefined.mkPredefinedCrcFun">
+<tt class="descclassname">crcmod.predefined.</tt><tt class="descname">mkPredefinedCrcFun</tt><big>(</big><em>crc_name</em><big>)</big><a class="headerlink" href="#crcmod.predefined.mkPredefinedCrcFun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function factory that returns a new function for calculating CRCs
+using a specified CRC algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>crc_name</em> (string) &#8211; The name of the predefined CRC algorithm to use.</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body">CRC calculation function</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body">function</td>
+</tr>
+</tbody>
+</table>
+<p>The function that is returned is the same as that returned by <a title="crcmod.mkCrcFun" class="reference external" href="crcmod.html#crcmod.mkCrcFun"><tt class="xref docutils literal"><span class="pre">crcmod.mkCrcFun()</span></tt></a>:</p>
+<dl class="function">
+<dt id="crcmod.predefined..crc_function">
+<tt class="descclassname">.</tt><tt class="descname">crc_function</tt><big>(</big><em>data</em><span class="optional">[</span>, <em>crc=initCrc</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.predefined..crc_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>data</em> (byte string) &#8211; Data for which to calculate the CRC.</li>
+<li><em>crc</em> &#8211; Initial CRC value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Calculated CRC value.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">integer</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="crcmod.predefined.mkCrcFun">
+<tt class="descclassname">crcmod.predefined.</tt><tt class="descname">mkCrcFun</tt><big>(</big><em>crc_name</em><big>)</big><a class="headerlink" href="#crcmod.predefined.mkCrcFun" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an alias for <a title="crcmod.predefined.mkPredefinedCrcFun" class="reference internal" href="#crcmod.predefined.mkPredefinedCrcFun"><tt class="xref docutils literal"><span class="pre">crcmod.predefined.mkPredefinedCrcFun()</span></tt></a>. However, it is not defined when
+<tt class="xref docutils literal"><span class="pre">crcmod.predefined</span></tt> is imported using the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">crcmod.predefined</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p><strong>CRC-32</strong> example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">crcmod.predefined</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32_func</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">predefined</span><span class="o">.</span><span class="n">mkCrcFun</span><span class="p">(</span><span class="s">&#39;crc-32&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32_func</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="go">&#39;0xcbf43926L&#39;</span>
+</pre></div>
+</div>
+<p><strong>XMODEM</strong> example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">xmodem_crc_func</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">predefined</span><span class="o">.</span><span class="n">mkCrcFun</span><span class="p">(</span><span class="s">&#39;xmodem&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">xmodem_crc_func</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="go">&#39;0x31c3&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="class-predefinedcrc">
+<h2>Class <a title="crcmod.predefined.PredefinedCrc" class="reference internal" href="#crcmod.predefined.PredefinedCrc"><tt class="xref docutils literal"><span class="pre">PredefinedCrc</span></tt></a><a class="headerlink" href="#class-predefinedcrc" title="Permalink to this headline">¶</a></h2>
+<p>This class is inherited from the <a title="crcmod.Crc" class="reference external" href="crcmod.html#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">crcmod.Crc</span></tt></a> class, and is the same except for the
+initialization.  It specifies a CRC algorithm by name rather than its parameters.</p>
+<dl class="class">
+<dt id="crcmod.predefined.PredefinedCrc">
+<em class="property">class </em><tt class="descclassname">crcmod.predefined.</tt><tt class="descname">PredefinedCrc</tt><big>(</big><em>crc_name</em><big>)</big><a class="headerlink" href="#crcmod.predefined.PredefinedCrc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <a title="crcmod.predefined.Crc" class="reference internal" href="#crcmod.predefined.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> object for calculating CRCs using a specified CRC algorithm.</p>
+<p>The parameter is the same as that for the factory function <a title="crcmod.predefined.mkPredefinedCrcFun" class="reference internal" href="#crcmod.predefined.mkPredefinedCrcFun"><tt class="xref docutils literal"><span class="pre">crcmod.predefined.mkPredefinedCrcFun()</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>crc_name</em> (string) &#8211; The name of the predefined CRC algorithm to use.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="crcmod.predefined.Crc">
+<em class="property">class </em><tt class="descclassname">crcmod.predefined.</tt><tt class="descname">Crc</tt><big>(</big><em>poly</em><span class="optional">[</span>, <em>initCrc</em>, <em>rev</em>, <em>xorOut</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.predefined.Crc" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is an alias for <a title="crcmod.predefined.PredefinedCrc" class="reference internal" href="#crcmod.predefined.PredefinedCrc"><tt class="xref docutils literal"><span class="pre">crcmod.predefined.PredefinedCrc</span></tt></a>. However, it is not defined when
+<tt class="xref docutils literal"><span class="pre">crcmod.predefined</span></tt> is imported using the form:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">crcmod.predefined</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="id4">
+<h3>Examples<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p><strong>CRC-32</strong> Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">crcmod.predefined</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">predefined</span><span class="o">.</span><span class="n">Crc</span><span class="p">(</span><span class="s">&#39;crc-32&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32</span><span class="o">.</span><span class="n">crcValue</span><span class="p">)</span>
+<span class="go">&#39;0xcbf43926L&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;CBF43926&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">crcmod.predefined</span></tt> &#8211; CRC calculation using predefined algorithms</a><ul>
+<li><a class="reference external" href="#predefined-crc-algorithms">Predefined CRC algorithms</a></li>
+<li><a class="reference external" href="#mkpredefinedcrcfun-crc-function-factory"><tt class="docutils literal"><span class="pre">mkPredefinedCrcFun()</span></tt> &#8211; CRC function factory</a><ul>
+<li><a class="reference external" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-predefinedcrc">Class <tt class="docutils literal"><span class="pre">PredefinedCrc</span></tt></a><ul>
+<li><a class="reference external" href="#id4">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="crcmod.html"
+                                  title="previous chapter"><tt class="docutils literal docutils literal"><span class="pre">crcmod</span></tt> &#8211; CRC calculation</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/crcmod.predefined.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="crcmod.html" title="crcmod – CRC calculation"
+             >previous</a> |</li>
+        <li><a href="index.html">crcmod v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Raymond L Buvel.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>
