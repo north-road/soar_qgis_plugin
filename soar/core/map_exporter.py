@@ -141,9 +141,14 @@ class MapPublisher(QgsTask):
         self.upload_start_reply.finished.connect(loop.quit)
         loop.exec()
 
-        API_CLIENT.parse_request_upload_reply(self.upload_start_reply)
-
+        res = API_CLIENT.parse_request_upload_reply(self.upload_start_reply)
         self.upload_start_reply = None
+
+        if res is None:
+            # error occurred
+            return False
+
+        API_CLIENT.upload_file(self.settings.output_file_name,res)
 
         self.cleanup()
         return True
