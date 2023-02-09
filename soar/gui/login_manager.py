@@ -3,6 +3,7 @@ from enum import Enum
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
     QObject,
+    pyqtSignal
 )
 from qgis.core import (
     Qgis,
@@ -23,6 +24,8 @@ class LoginStatus(Enum):
 
 
 class LoginManager(QObject):
+    logged_in = pyqtSignal()
+    login_failed = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -39,6 +42,12 @@ class LoginManager(QObject):
 
         self.queued_callbacks = []
 
+    def is_logged_in(self) -> bool:
+        """
+        Returns True if the user is logged in
+        """
+        return self.status == LoginStatus.LoggedIn
+
     def login_callback(self, callback) -> bool:
         """
         Returns True if the user is already logged in, or False
@@ -50,8 +59,13 @@ class LoginManager(QObject):
             return True
 
         self.queued_callbacks.append(callback)
+        return self.start_login()
 
-        if self.status == LoginStatus.LoggingIn:
+    def start_login(self):
+        """
+        Start a login process
+        """
+        if self.status != LoginStatus.LoggedOut:
             return False
 
         from .credential_dialog import CredentialDialog
@@ -82,6 +96,7 @@ class LoginManager(QObject):
         iface.messageBar().pushCritical(self.tr('Soar.earth'), login_error)
 
         self.queued_callbacks = []
+        self.login_failed.emit()
 
     def _login_success(self):
         if self._logging_in_message and not sip.isdeleted(self._logging_in_message):
@@ -95,6 +110,8 @@ class LoginManager(QObject):
         self.queued_callbacks = []
         for callback in callbacks:
             callback()
+
+        self.logged_in.emit()
 
 
 LOGIN_MANAGER = LoginManager()
