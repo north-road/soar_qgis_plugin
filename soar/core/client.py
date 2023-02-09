@@ -607,18 +607,18 @@ class ApiClient(QObject):
         return QgsNetworkAccessManager.instance().post(request, json.dumps(params).encode())
 
     def parse_request_upload_reply(self,
-                                   reply: QNetworkReply):
+                                   reply: QNetworkReply) -> Optional[Dict]:
         """
         Parses a request upload reply
         """
         if sip.isdeleted(self):
-            return []
+            return None
 
         if not reply or sip.isdeleted(reply):
-            return
+            return None
 
         if reply.error() == QNetworkReply.OperationCanceledError:
-            return
+            return None
 
         if reply.error() != QNetworkReply.NoError:
             reply_json = json.loads(reply.readAll().data().decode())
@@ -628,10 +628,27 @@ class ApiClient(QObject):
                 error = reply.errorString()
 
             self.upload_error_occurred.emit(error)
-            return
+            return None
 
-        reply_json = json.loads(reply.readAll().data().decode())
-        print(reply_json)
+        return json.loads(reply.readAll().data().decode())
+
+    def upload_file(self, file_path: str, upload_details: Dict):
+        """
+        Uploads a file
+        """
+        from .uploader import SoarUploader
+
+        SoarUploader.upload_file(
+            file_path,
+            bucket_name= upload_details['bucketName'],
+            filename=upload_details['filename'],
+            access_key_id = upload_details['stsCredentials']['accessKeyId'],
+            security_token=upload_details['stsCredentials']['securityToken'],
+            access_secret_key=upload_details['stsCredentials']['accessSecretKey'],
+            listing_id=upload_details['listingId'],
+            key=upload_details['key'],
+            oss_region=upload_details['ossRegion']
+        )
 
     @staticmethod
     def _to_url_query(parameters: Dict[str, object]) -> QUrlQuery:
