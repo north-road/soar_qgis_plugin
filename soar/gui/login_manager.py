@@ -36,6 +36,7 @@ class LoginManager(QObject):
         self.password: str = ''
 
         self._logging_in_message = None
+        self._login_failed_message = None
 
         API_CLIENT.login_error_occurred.connect(self._login_error_occurred)
         API_CLIENT.fetched_token.connect(self._login_success)
@@ -86,22 +87,30 @@ class LoginManager(QObject):
         API_CLIENT.login(username, password)
         return False
 
-    def _login_error_occurred(self, error: str):
+    def _cleanup_messages(self):
         if self._logging_in_message and not sip.isdeleted(self._logging_in_message):
             iface.messageBar().popWidget(self._logging_in_message)
             self._logging_in_message = None
+        if self._login_failed_message and not sip.isdeleted(self._login_failed_message):
+            iface.messageBar().popWidget(self._login_failed_message)
+            self._login_failed_message = None
+
+    def _login_error_occurred(self, error: str):
+        self._cleanup_messages()
 
         self.status = LoginStatus.LoggedOut
         login_error = self.tr('Login error: {}'.format(error))
-        iface.messageBar().pushCritical(self.tr('Soar.earth'), login_error)
+
+        self._login_failed_message = QgsMessageBarItem(self.tr('Soar.earth'),
+                                                     login_error,
+                                                     Qgis.MessageLevel.Critical)
+        iface.messageBar().pushItem(self._login_failed_message)
 
         self.queued_callbacks = []
         self.login_failed.emit()
 
     def _login_success(self):
-        if self._logging_in_message and not sip.isdeleted(self._logging_in_message):
-            iface.messageBar().popWidget(self._logging_in_message)
-            self._logging_in_message = None
+        self._cleanup_messages()
 
         self.status = LoginStatus.LoggedIn
         iface.messageBar().pushSuccess(self.tr('Soar.earth'), self.tr('Logged in'))
