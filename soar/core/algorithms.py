@@ -28,6 +28,7 @@ from qgis.core import (
     QgsRasterPipe,
     QgsProcessingParameterString,
     QgsCoordinateReferenceSystem,
+    QgsProcessingParameterBoolean,
     QgsRasterProjector,
     QgsRasterBlockFeedback
 )
@@ -47,6 +48,8 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
     DESCRIPTION = 'DESCRIPTION'
     TAGS = 'TAGS'
     CATEGORY = 'CATEGORY'
+    OWN_WORK = 'OWN_WORK'
+    ACCEPT_TERMS = 'ACCEPT_TERMS'
 
     CATEGORY_STRINGS = ['Agriculture',
                         'Climate',
@@ -143,6 +146,18 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
             defaultValue=0
         ))
 
+        self.addParameter(QgsProcessingParameterBoolean(
+            self.OWN_WORK,
+            'This is my own work and/or I have the right to publish this content.',
+            False
+        ))
+
+        self.addParameter(QgsProcessingParameterBoolean(
+            self.ACCEPT_TERMS,
+            'I agree to the soar.earth Terms of Service.',
+            False
+        ))
+
     @staticmethod
     def clone_pipe(pipe: QgsRasterPipe) -> QgsRasterPipe:
         res = QgsRasterPipe()
@@ -165,6 +180,12 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
                          parameters,
                          context,
                          feedback):
+
+        if not self.parameterAsBool(parameters, self.OWN_WORK, context):
+            raise QgsProcessingException('You must confirm that this is your own work or you have rights to publish this content')
+
+        if not self.parameterAsBool(parameters, self.ACCEPT_TERMS, context):
+            raise QgsProcessingException('You must accept the soar.earth Terms of Service')
 
         mode = self.parameterAsEnum(parameters, self.MODE, context)
         title = self.parameterAsString(parameters, self.TITLE, context)
