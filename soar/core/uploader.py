@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar API client
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

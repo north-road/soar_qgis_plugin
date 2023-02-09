@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar export confirmation dialog
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class ConfirmExportDialog(base, ui):
 
         self.check_accept.toggled.connect(self._toggle_accept)
 
-        self.setWindowTitle(self.tr('Export Map to Soar.earth'))
+        self.setWindowTitle(self.tr('Export Map to Soar'))
 
     def _toggle_accept(self, accepted: bool):
         """

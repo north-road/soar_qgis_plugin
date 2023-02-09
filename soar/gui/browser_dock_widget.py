@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth plugin
+"""Soar plugin
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class BrowserDockWidget(QgsDockWidget):
         super().__init__(parent)
 
         self.setObjectName('SoarBrowserDockWidget')
-        self.setWindowTitle(self.tr('Soar.earth Browser'))
+        self.setWindowTitle(self.tr('Soar Browser'))
 
         vl = QVBoxLayout()
         vl.setContentsMargins(0, 0, 0, 0)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar.earth processing library
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from ..gui import GuiUtils
 
 class SoarEarthProvider(QgsProcessingProvider):
     """
-    Soar.earth Processing provider
+    Soar Processing provider
     """
 
     def __init__(self):  # pylint: disable=useless-super-delegation
@@ -35,13 +35,13 @@ class SoarEarthProvider(QgsProcessingProvider):
             self.addAlgorithm(alg())
 
     def id(self):  # pylint: disable=missing-docstring
-        return 'soarearth'
+        return 'soar'
 
     def name(self):  # pylint: disable=missing-docstring
-        return 'soar.earth'
+        return 'Soar'
 
     def longName(self):  # pylint: disable=missing-docstring
-        return 'Soar.earth map publishing tools'
+        return 'Soar map publishing tools'
 
     def icon(self):  # pylint: disable=missing-docstring
         return GuiUtils.get_icon('soar_provider.svg')

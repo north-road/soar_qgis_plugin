@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar.earth API client
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ class MapPublisher(QgsTask):
     failed = pyqtSignal(str)
 
     def __init__(self, settings: MapExportSettings, canvas: QgsMapCanvas):
-        super().__init__('Publishing map to Soar.earth', QgsTask.Flag.CanCancel)
+        super().__init__('Publishing map to Soar', QgsTask.Flag.CanCancel)
 
         self.settings = settings
         self.map_settings = self.settings.map_settings(canvas)
