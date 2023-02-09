@@ -33,7 +33,8 @@ But if doing 'from crc.predefined import *', only PredefinedCrc is imported.
 '''
 
 # local imports
-import crcmod
+from .crcmod import Crc
+from .crcmod import mkCrcFun
 
 __all__ = [
     'PredefinedCrc',
@@ -143,7 +144,7 @@ def _get_definition_by_name(crc_name):
     return definition
 
 
-class PredefinedCrc(crcmod.Crc):
+class PredefinedCrc(Crc):
     def __init__(self, crc_name):
         definition = _get_definition_by_name(crc_name)
         super().__init__(poly=definition['poly'], initCrc=definition['init'], rev=definition['reverse'], xorOut=definition['xor_out'])
@@ -155,7 +156,7 @@ Crc = PredefinedCrc
 
 def mkPredefinedCrcFun(crc_name):
     definition = _get_definition_by_name(crc_name)
-    return crcmod.mkCrcFun(poly=definition['poly'], initCrc=definition['init'], rev=definition['reverse'], xorOut=definition['xor_out'])
+    return mkCrcFun(poly=definition['poly'], initCrc=definition['init'], rev=definition['reverse'], xorOut=definition['xor_out'])
 
 
 # crcmod.predefined.mkCrcFun is an alias for crcmod.predefined.mkPredefinedCrcFun
