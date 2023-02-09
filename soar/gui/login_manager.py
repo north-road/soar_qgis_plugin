@@ -54,6 +54,8 @@ class LoginManager(QObject):
         if self.status == LoginStatus.LoggingIn:
             return False
 
+        self.status = LoginStatus.LoggingIn
+
         self._logging_in_message = QgsMessageBarItem(self.tr('Soar.earth'), self.tr('Logging in...'), Qgis.MessageLevel.Info)
         iface.messageBar().pushItem(self._logging_in_message)
 
