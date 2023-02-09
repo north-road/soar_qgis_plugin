@@ -29,9 +29,9 @@ import random
 import abc, six
 import struct
 
-from Crypto.Cipher import AES
-from Crypto import Random
-from Crypto.Util import Counter
+#from Crypto.Cipher import AES
+#from Crypto import Random
+#from Crypto.Util import Counter
 
 from .crc64_combine import mkCombineFun
 from .compat import to_string, to_bytes, urlparse
