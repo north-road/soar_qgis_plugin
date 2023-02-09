@@ -205,7 +205,7 @@ class Listing:
 
         return layer_uri
 
-    def to_layer_metadata(self) -> Optional[QgsLayerMetadata]:
+    def to_layer_metadata(self) -> Optional[QgsLayerMetadata]:  # pylint: disable=too-many-branches,too-many-statements
         """
         Converts the listing to QGIS layer metadata
         """
