@@ -4,9 +4,9 @@ from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
     QObject,
 )
-
 from qgis.core import (
-    Qgis
+    Qgis,
+    QgsSettings
 )
 from qgis.gui import (
     QgsMessageBarItem
@@ -29,7 +29,7 @@ class LoginManager(QObject):
 
         self.status: LoginStatus = LoginStatus.LoggedOut
 
-        self.username: str = ''
+        self.username: str = QgsSettings().value('soar/username', '', str)
         self.password: str = ''
 
         self._logging_in_message = None
@@ -54,12 +54,22 @@ class LoginManager(QObject):
         if self.status == LoginStatus.LoggingIn:
             return False
 
+        from .credential_dialog import CredentialDialog
+        dlg = CredentialDialog()
+        if not dlg.exec_():
+            return False
+
         self.status = LoginStatus.LoggingIn
 
-        self._logging_in_message = QgsMessageBarItem(self.tr('Soar.earth'), self.tr('Logging in...'), Qgis.MessageLevel.Info)
+        username = dlg.username()
+        password = dlg.password()
+
+        self._logging_in_message = QgsMessageBarItem(self.tr('Soar.earth'),
+                                                     self.tr('Logging in...'),
+                                                     Qgis.MessageLevel.Info)
         iface.messageBar().pushItem(self._logging_in_message)
 
-        API_CLIENT.login(self.username, self.password)
+        API_CLIENT.login(username, password)
         return False
 
     def _login_error_occurred(self, error: str):
