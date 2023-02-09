@@ -20,6 +20,10 @@ from qgis.PyQt.QtCore import (
     QObject,
     pyqtSignal
 )
+from qgis.PyQt.QtWidgets import (
+    QPushButton
+)
+
 from qgis.core import (
     Qgis,
     QgsSettings
@@ -91,6 +95,8 @@ class LoginManager(QObject):
         if self.status != LoginStatus.LoggedOut:
             return False
 
+        self._cleanup_messages()
+
         from .credential_dialog import CredentialDialog  # pylint: disable=import-outside-toplevel
         dlg = CredentialDialog()
         if not dlg.exec_():
@@ -132,6 +138,11 @@ class LoginManager(QObject):
         self._login_failed_message = QgsMessageBarItem(self.tr('Soar.earth'),
                                                        login_error,
                                                        Qgis.MessageLevel.Critical)
+
+        login_button = QPushButton(self.tr("Try Again"))
+        login_button.clicked.connect(self.start_login)
+        self._login_failed_message.layout().addWidget(login_button)
+
         iface.messageBar().pushItem(self._login_failed_message)
 
         self.queued_callbacks = []
