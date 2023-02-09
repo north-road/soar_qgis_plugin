@@ -16,8 +16,8 @@ import struct
 from functools import partial
 
 import six
-from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
-from Crypto.PublicKey import RSA
+#from Crypto.Cipher import PKCS1_OAEP, PKCS1_v1_5
+#from Crypto.PublicKey import RSA
 from ...external.aliyunsdkcore import client
 from ...external.aliyunsdkcore.acs_exception.exceptions import ServerException, ClientException
 from ...external.aliyunsdkcore.http_service import format_type, method_type
