@@ -242,6 +242,14 @@ class Listing:
             except AttributeError:
                 # requires QGIS 3.30+
                 pass
+
+            if self.user:
+                res.addHistoryItem('Uploaded to Soar by {} on {}'.format(self.user.name,
+                                                                         self.created_at.toString(
+                                                                             'yyyy-MM-dd')))
+            else:
+                res.addHistoryItem('Uploaded to Soar on {}'.format(self.created_at.toString(
+                    'yyyy-MM-dd')))
         if self.updated_at and self.updated_at.isValid():
             try:
                 res.setDateTime(Qgis.MetadataDateType.Revised, self.updated_at)
@@ -249,11 +257,23 @@ class Listing:
                 # requires QGIS 3.30+
                 pass
 
+            if self.updated_at != self.created_at:
+                res.addHistoryItem('Updated on Soar on {}'.format(self.updated_at.toString(
+                    'yyyy-MM-dd')))
+
+        res.addHistoryItem('Retrieved from on Soar on {}'.format(QDateTime.currentDateTime().toString(
+            'yyyy-MM-dd')))
+
         if self.user:
             author = QgsAbstractMetadataBase.Contact()
             author.name = self.user.name
             author.role = 'author'
             res.addContact(author)
+            res.setRights(['Authored by {}'.format(author.name)])
+        else:
+            res.setRights(['Retrieved from Soar'])
+
+        res.setLicenses(['Subject to the soar.earth Terms of Service'])
 
         if self.geometry and not self.geometry.isEmpty():
             extent = QgsLayerMetadata.Extent()
