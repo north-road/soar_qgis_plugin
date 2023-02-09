@@ -15,13 +15,13 @@ __revision__ = '$Format:%H$'
 
 import json
 from enum import Enum
+from pathlib import Path
 from typing import (
     Optional,
     List,
     Dict,
     Tuple
 )
-from pathlib import Path
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
@@ -639,9 +639,9 @@ class ApiClient(QObject):
 
         SoarUploader.upload_file(
             file_path,
-            bucket_name= upload_details['bucketName'],
+            bucket_name=upload_details['bucketName'],
             filename=upload_details['filename'],
-            access_key_id = upload_details['stsCredentials']['accessKeyId'],
+            access_key_id=upload_details['stsCredentials']['accessKeyId'],
             security_token=upload_details['stsCredentials']['securityToken'],
             access_secret_key=upload_details['stsCredentials']['accessSecretKey'],
             listing_id=upload_details['listingId'],

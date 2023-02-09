@@ -17,12 +17,9 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import (
     QDialogButtonBox
 )
-
 from qgis.core import QgsSettings
 
 from .gui_utils import GuiUtils
-
-from .login_manager import LOGIN_MANAGER
 
 ui, base = uic.loadUiType(GuiUtils.get_ui_file_path('credential_dialog.ui'))
 
