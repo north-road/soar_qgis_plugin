@@ -15,12 +15,15 @@ __revision__ = '$Format:%H$'
 
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from osgeo import gdal
 from qgis.PyQt.QtCore import (
-    QSize
+    QSize,
+    QEventLoop
 )
+from qgis.PyQt.QtNetwork import QNetworkReply
+
 from qgis.core import (
     Qgis,
     QgsProject,
@@ -51,6 +54,7 @@ class MapExportSettings:
         self.size: QSize = QSize()
         self.scale: float = 0
         self.extent: QgsRectangle = QgsRectangle()
+        self.output_file_name: Optional[str] = None
 
     def map_settings(self, map_canvas: QgsMapCanvas) -> QgsMapSettings:
         """
@@ -113,12 +117,14 @@ class MapPublisher(QgsTask):
 
         self.temp_dir = tempfile.TemporaryDirectory()
         temp_path = Path(self.temp_dir.name)
-        self.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
+        self.settings.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
 
         self.addSubTask(
-            QgsMapRendererTask(self.map_settings, self.output_file_name, fileFormat='TIF'),
+            QgsMapRendererTask(self.map_settings, self.settings.output_file_name, fileFormat='TIF'),
             subTaskDependency=QgsTask.ParentDependsOnSubTask
         )
+
+        self.upload_start_reply: Optional[QNetworkReply] = None
 
     def cleanup(self):
         self.temp_dir.cleanup()
@@ -126,6 +132,18 @@ class MapPublisher(QgsTask):
 
     def run(self) -> bool:
         self.georeference_output()
+
+        from .client import API_CLIENT
+
+        self.upload_start_reply = API_CLIENT.request_upload_start(self.settings)
+
+        loop = QEventLoop()
+        self.upload_start_reply.finished.connect(loop.quit)
+        loop.exec()
+
+        API_CLIENT.parse_request_upload_reply(self.upload_start_reply)
+
+        self.upload_start_reply = None
 
         self.cleanup()
         return True
@@ -140,7 +158,7 @@ class MapPublisher(QgsTask):
         f -= 0.5 * d
         f -= 0.5 * e
 
-        dst_ds = gdal.Open(self.output_file_name, gdal.GA_Update)
+        dst_ds = gdal.Open(self.settings.output_file_name, gdal.GA_Update)
         dst_ds.SetGeoTransform([c, a, b, f, d, e])
         dst_ds.SetProjection(QgsCoordinateReferenceSystem('EPSG:3857').toWkt(
             QgsCoordinateReferenceSystem.WKT_PREFERRED_GDAL))
