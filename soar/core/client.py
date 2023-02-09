@@ -20,6 +20,7 @@ from typing import (
     List,
     Dict
 )
+from pathlib import Path
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
@@ -46,6 +47,8 @@ from qgis.core import (
     QgsAbstractMetadataBase,
     QgsNetworkAccessManager
 )
+
+from .map_exporter import MapExportSettings
 
 
 class ListingType(Enum):
@@ -293,7 +296,8 @@ class Listing:
 
         layer.setCustomProperty('_soar_layer_id', self.id)
         if self.tile_url_expiry_at:
-            layer.setCustomProperty('_soar_layer_expiry', self.tile_url_expiry_at.toString(Qt.ISODate))
+            layer.setCustomProperty('_soar_layer_expiry',
+                                    self.tile_url_expiry_at.toString(Qt.ISODate))
 
         return layer
 
@@ -380,7 +384,8 @@ class ListingQuery:
                  offset: int = 0):
         self.user_id: Optional[str] = user_id
         # default to filtering to tile layers only
-        self.listing_type: Optional[ListingType] = listing_type if listing_type is not None else ListingType.TileLayer
+        self.listing_type: Optional[
+            ListingType] = listing_type if listing_type is not None else ListingType.TileLayer
         self.order_by: Optional[OrderBy] = order_by
         self.aoi: Optional[QgsGeometry] = aoi
         self.keywords: Optional[str] = keywords
@@ -424,10 +429,12 @@ class ApiClient(QObject):
     URL = "https://api.soar.earth/v1"
     LISTINGS_ENDPOINT = 'listings'
     LOGIN_ENDPOINT = 'user/login'
+    UPLOAD_ENDPOINT = 'listings/upload'
 
     error_occurred = pyqtSignal(str)
     login_error_occurred = pyqtSignal(str)
     fetched_token = pyqtSignal()
+    upload_error_occurred = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -458,7 +465,8 @@ class ApiClient(QObject):
         }
         login_request = self._build_request(self.LOGIN_ENDPOINT, headers)
 
-        self.login_reply = QgsNetworkAccessManager.instance().post(login_request, json.dumps(params).encode())
+        self.login_reply = QgsNetworkAccessManager.instance().post(login_request,
+                                                                   json.dumps(params).encode())
         self.login_reply.finished.connect(self._login_finished)
 
     def _login_finished(self):
@@ -560,6 +568,70 @@ class ApiClient(QObject):
 
         listing_json = json.loads(reply.readAll().data().decode())
         return Listing.from_json(listing_json)
+
+    def request_upload_start(self,
+                             export_settings: MapExportSettings,
+                             domain: str = 'soar.earth') -> QNetworkReply:
+        """
+        Asks for a upload
+        """
+        headers = {}
+        if domain:
+            headers = {
+                'Subdomain': domain,
+                'accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(self.id_token)
+            }
+
+        metadata = {
+            'title': export_settings.title,
+            'description': export_settings.description,
+            'tags': export_settings.tags,
+            'categories': [export_settings.category],
+        }
+
+        params = {
+            'listingType': 'TILE_LAYER',
+            'filename': Path(export_settings.output_file_name).name,
+            'metadata': json.dumps(metadata),
+            'title': metadata['title'],
+            'description': metadata['description'],
+            'tags': metadata['tags'],
+            'categories': metadata['categories']
+        }
+
+        request = self._build_request(self.UPLOAD_ENDPOINT,
+                                      headers)
+
+        return QgsNetworkAccessManager.instance().post(request, json.dumps(params).encode())
+
+    def parse_request_upload_reply(self,
+                                   reply: QNetworkReply):
+        """
+        Parses a request upload reply
+        """
+        if sip.isdeleted(self):
+            return []
+
+        if not reply or sip.isdeleted(reply):
+            return
+
+        if reply.error() == QNetworkReply.OperationCanceledError:
+            return
+
+        if reply.error() != QNetworkReply.NoError:
+            reply_json = json.loads(reply.readAll().data().decode())
+
+            error = reply_json.get('error')
+            if not error:
+                error = reply.errorString()
+
+            self.upload_error_occurred.emit(error)
+            return
+
+        reply_json = json.loads(reply.readAll().data().decode())
+        print(reply_json)
 
     @staticmethod
     def _to_url_query(parameters: Dict[str, object]) -> QUrlQuery:
