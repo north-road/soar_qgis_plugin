@@ -35,6 +35,7 @@ from qgis.core import (
 
 from .client import API_CLIENT
 from .map_exporter import MapExportSettings
+from ..gui import LOGIN_MANAGER
 
 
 class PublishRasterToSoar(QgsProcessingAlgorithm):
@@ -168,6 +169,17 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         return res
 
     def prepareAlgorithm(self, parameters, context, feedback):
+        if not LOGIN_MANAGER.is_logged_in():
+            loop = QEventLoop()
+            LOGIN_MANAGER.logged_in.connect(loop.quit)
+            LOGIN_MANAGER.login_failed.connect(loop.quit)
+
+            LOGIN_MANAGER.start_login()
+            loop.exec()
+
+            if not LOGIN_MANAGER.is_logged_in():
+                return False
+
         input_layer = self.parameterAsRasterLayer(parameters, self.INPUT, context)
 
         self.data_provider = input_layer.dataProvider().clone()
