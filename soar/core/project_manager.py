@@ -103,7 +103,7 @@ class ProjectManager(QObject):
         """
         Returns the map title to use when exporting the project to soar.earth
         """
-        title, ok = self.project.readEntry('soar', 'map_title')
+        title, _ = self.project.readEntry('soar', 'map_title')
         if title:
             return title
 
@@ -123,7 +123,7 @@ class ProjectManager(QObject):
         """
         Returns the map description to use when exporting the project to soar.earth
         """
-        description, ok = self.project.readEntry('soar', 'map_description')
+        description, _ = self.project.readEntry('soar', 'map_description')
         if description:
             return description
 
@@ -143,7 +143,7 @@ class ProjectManager(QObject):
         """
         Returns the map tags to use when exporting the project to soar.earth
         """
-        tags, ok = self.project.readListEntry('soar', 'map_tags')
+        tags, _ = self.project.readListEntry('soar', 'map_tags')
         if tags:
             return tags
 
@@ -169,7 +169,7 @@ class ProjectManager(QObject):
         """
         Returns the soar category for the map
         """
-        cat, ok = self.project.readEntry('soar', 'map_category')
+        cat, _ = self.project.readEntry('soar', 'map_category')
         if cat:
             return cat
 

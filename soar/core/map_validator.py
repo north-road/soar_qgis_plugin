@@ -43,7 +43,7 @@ class MapValidator(QObject):
         """
 
         checks = [self.check_crs]
-        self.errors = []
+        self._error_list = []
         for check in checks:
             try:
                 check()

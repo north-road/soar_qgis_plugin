@@ -49,8 +49,6 @@ from qgis.core import (
     QgsNetworkAccessManager
 )
 
-from .map_exporter import MapExportSettings
-
 
 class ListingType(Enum):
     """
@@ -443,6 +441,7 @@ class ApiClient(QObject):
             'Subdomain': 'soar.earth',
             'accept': 'application/json'
         }
+        self.id_token = None
 
         self.login_reply: Optional[QNetworkReply] = None
 
@@ -470,8 +469,11 @@ class ApiClient(QObject):
         self.login_reply.finished.connect(self._login_finished)
 
     def _login_finished(self):
+        """
+        Triggered when the login request finishes
+        """
         if sip.isdeleted(self):
-            return []
+            return
 
         if not self.login_reply or sip.isdeleted(self.login_reply):
             self.login_reply = None
@@ -570,7 +572,7 @@ class ApiClient(QObject):
         return Listing.from_json(listing_json)
 
     def request_upload_start(self,
-                             export_settings: MapExportSettings,
+                             export_settings: 'MapExportSettings',
                              domain: str = 'soar.earth') -> QNetworkReply:
         """
         Asks for a upload
@@ -635,7 +637,7 @@ class ApiClient(QObject):
         """
         Uploads a file
         """
-        from .uploader import SoarUploader
+        from .uploader import SoarUploader  # pylint: disable=import-outside-toplevel
 
         SoarUploader.upload_file(
             file_path,

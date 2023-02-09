@@ -47,17 +47,26 @@ class CredentialDialog(base, ui):
         self._validate()
 
     def _validate(self):
+        """
+        Validates current dialog state
+        """
         is_valid = bool(self.username() and self.password())
 
         self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(is_valid)
 
-    def accept(self):
+    def accept(self):  # pylint: disable=missing-function-docstring
         QgsSettings().setValue('soar/username', self.username())
 
         super().accept()
 
     def username(self) -> str:
+        """
+        Returns the username entered in the dialog
+        """
         return self.leUsername.text()
 
     def password(self) -> str:
+        """
+        Returns the password entered in the dialog
+        """
         return self.lePassword.text()

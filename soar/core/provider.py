@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 
-from qgis.core import QgsProcessingProvider, Qgis
+from qgis.core import QgsProcessingProvider
 
 from .algorithms import (
     PublishRasterToSoar

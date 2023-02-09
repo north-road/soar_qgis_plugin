@@ -103,7 +103,9 @@ class SoarPlugin:
 
         self.provider = SoarEarthProvider()
 
-    # qgis plugin interface
+        self.task = None
+
+        # qgis plugin interface
 
     # pylint: disable=missing-function-docstring
 

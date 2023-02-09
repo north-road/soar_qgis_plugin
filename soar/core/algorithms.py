@@ -33,9 +33,7 @@ from qgis.core import (
     QgsRasterBlockFeedback
 )
 
-from .client import API_CLIENT
 from .map_exporter import MapExportSettings
-from ..gui import LOGIN_MANAGER
 
 
 class PublishRasterToSoar(QgsProcessingAlgorithm):
@@ -169,6 +167,8 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         return res
 
     def prepareAlgorithm(self, parameters, context, feedback):
+        from ..gui import LOGIN_MANAGER  # pylint: disable=import-outside-toplevel
+
         if not LOGIN_MANAGER.is_logged_in():
             loop = QEventLoop()
             LOGIN_MANAGER.logged_in.connect(loop.quit)
@@ -187,8 +187,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
 
         return True
 
-    def processAlgorithm(self,
-                         # pylint: disable=too-many-locals,too-many-statements,too-many-return-statements
+    def processAlgorithm(self,  # pylint: disable=too-many-branches,too-many-statements,too-many-locals
                          parameters,
                          context,
                          feedback):
@@ -269,7 +268,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
             raise QgsProcessingException(
                 'An error occurred: {}'.format('\n'.join(writer_feedback.errors())))
 
-        from .client import API_CLIENT
+        from .client import API_CLIENT  # pylint: disable=import-outside-toplevel
 
         settings = MapExportSettings()
         settings.title = title
@@ -289,14 +288,14 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
             # error occurred
             if error:
                 raise QgsProcessingException(error)
-            else:
-                raise QgsProcessingException('Upload failed for unknown reason')
+
+            raise QgsProcessingException('Upload failed for unknown reason')
 
         try:
             API_CLIENT.upload_file(temp_file, res)
             feedback.pushInfo('Dataset successfully uploaded')
         except Exception as e:
-            raise QgsProcessingException(str(e))
+            raise QgsProcessingException(str(e)) from e
 
         return {}
 
