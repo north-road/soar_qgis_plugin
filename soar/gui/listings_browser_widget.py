@@ -44,7 +44,7 @@ from qgis.gui import (
 from .responsive_table_layout import ResponsiveTableWidget
 
 from ..core.client import (
-    ApiClient,
+    API_CLIENT,
     Listing,
     ListingQuery
 )
@@ -65,8 +65,6 @@ class ListingsBrowserWidget(QgsPanelWidget):
         super().__init__()
 
         self.setPanelTitle(self.tr('Listings'))
-
-        self.api_client = ApiClient()
 
         self.scroll_area = QgsScrollArea()
         self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -148,7 +146,7 @@ class ListingsBrowserWidget(QgsPanelWidget):
         query.offset = PAGE_SIZE * (page - 1)
         self._current_query = query
 
-        request = self.api_client.request_listings(query)
+        request = API_CLIENT.request_listings(query)
         self._current_reply = QgsNetworkAccessManager.instance().get(request)
         self._current_reply.finished.connect(partial(self._reply_finished, self._current_reply))
         self.setCursor(Qt.WaitCursor)
@@ -173,7 +171,7 @@ class ListingsBrowserWidget(QgsPanelWidget):
             print('error occurred :(')
             return
 
-        listings = self.api_client.parse_listings_reply(reply)
+        listings = API_CLIENT.parse_listings_reply(reply)
 
         self.table_widget.setUpdatesEnabled(False)
 

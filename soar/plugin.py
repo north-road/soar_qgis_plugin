@@ -43,6 +43,10 @@ from .gui import (
 )
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
+from .gui import (
+    LOGIN_MANAGER
+)
+
 from .core import (
     ProjectManager,
     MapValidator,
@@ -174,6 +178,12 @@ class SoarPlugin:
         return QCoreApplication.translate('Soar', message)
 
     def export_map_to_soar(self):
+        """
+        Exports the current map (project) to soar
+        """
+        LOGIN_MANAGER.login_callback(self._export_map_to_soar_private)
+
+    def _export_map_to_soar_private(self):
         """
         Exports the current map (project) to soar
         """

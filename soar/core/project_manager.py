@@ -31,7 +31,7 @@ from qgis.core import (
     QgsRectangle
 )
 
-from .client import ApiClient
+from .client import API_CLIENT
 
 
 class ProjectManager(QObject):
@@ -44,8 +44,6 @@ class ProjectManager(QObject):
         self.project = project
 
         self.project.layerWasAdded.connect(self._on_layer_added)
-
-        self.api_client = ApiClient()
 
     def _on_layer_added(self, layer: QgsMapLayer):
         """
@@ -85,7 +83,7 @@ class ProjectManager(QObject):
         """
         soar_layer_id = layer.customProperty('_soar_layer_id')
 
-        request = self.api_client.request_listing(soar_layer_id)
+        request = API_CLIENT.request_listing(soar_layer_id)
         reply = QgsNetworkAccessManager.instance().get(request)
         reply.finished.connect(partial(self._listing_fetched, reply, layer))
 
@@ -93,7 +91,7 @@ class ProjectManager(QObject):
         """
         Called when a listing has been fetched and we are ready to update a layer's URI
         """
-        full_listing = self.api_client.parse_listing_reply(reply)
+        full_listing = API_CLIENT.parse_listing_reply(reply)
 
         new_uri = full_listing.to_qgis_layer_source_string()
         layer.setDataSource(new_uri, layer.name(), 'wms')
