@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar.earth API client
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -90,10 +90,10 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         return 'tifftosoar'
 
     def displayName(self):
-        return 'Publish dataset to soar.earth'
+        return 'Publish dataset to Soar'
 
     def shortDescription(self):
-        return 'Publishes a GeoTIFF dataset to soar.earth'
+        return 'Publishes a GeoTIFF dataset to Soar'
 
     def group(self):
         return ''
@@ -102,7 +102,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         return ''
 
     def shortHelpString(self):
-        return "Publishes a GeoTIFF dataset to soar.earth"
+        return "Publishes a GeoTIFF dataset to Soar"
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterRasterLayer(

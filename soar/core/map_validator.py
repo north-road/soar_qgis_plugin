@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar.earth API client
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ class MapValidator(QObject):
 
         error_list = '\n'.join(["<li>{}</li>".format(e) for e in self._error_list])
 
-        description = self.tr('Map cannot be exported to soar.earth:')
+        description = self.tr('Map cannot be exported to Soar:')
         return '<p style="color: red; font-weight: bold">{}</p><ul>{}</ul>'.format(description, error_list)
 
     def check_crs(self):
@@ -70,5 +70,5 @@ class MapValidator(QObject):
         """
         if self.project.crs() != QgsCoordinateReferenceSystem('EPSG:3857'):
             raise ValidationError(self.tr(
-                'Maps published on soar.earth must be created using the Web Mercator projection '
+                'Maps published on Soar must be created using the Web Mercator projection '
                 '(EPSG:3857). Please change your project\'s CRS to EPSG:3857 and re-try.'))

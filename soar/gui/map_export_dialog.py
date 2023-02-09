@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar plugin
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class MapExportDialog(base, ui):
 
         self.setupUi(self)
 
-        self.setWindowTitle(self.tr('Export Map to Soar.earth'))
+        self.setWindowTitle(self.tr('Export Map to Soar'))
 
         self.map_canvas = map_canvas
         self.project_manager = project_manager

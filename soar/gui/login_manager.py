@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth API client
+"""Soar plugin
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ class LoginManager(QObject):
         username = dlg.username()
         password = dlg.password()
 
-        self._logging_in_message = QgsMessageBarItem(self.tr('Soar.earth'),
+        self._logging_in_message = QgsMessageBarItem(self.tr('Soar'),
                                                      self.tr('Logging in...'),
                                                      Qgis.MessageLevel.Info)
         iface.messageBar().pushItem(self._logging_in_message)
@@ -135,7 +135,7 @@ class LoginManager(QObject):
         self.status = LoginStatus.LoggedOut
         login_error = self.tr('Login error: {}'.format(error))
 
-        self._login_failed_message = QgsMessageBarItem(self.tr('Soar.earth'),
+        self._login_failed_message = QgsMessageBarItem(self.tr('Soar'),
                                                        login_error,
                                                        Qgis.MessageLevel.Critical)
 
@@ -155,7 +155,7 @@ class LoginManager(QObject):
         self._cleanup_messages()
 
         self.status = LoginStatus.LoggedIn
-        iface.messageBar().pushSuccess(self.tr('Soar.earth'), self.tr('Logged in'))
+        iface.messageBar().pushSuccess(self.tr('Soar'), self.tr('Logged in'))
 
         callbacks = self.queued_callbacks
         self.queued_callbacks = []

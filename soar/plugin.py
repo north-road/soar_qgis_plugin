@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""soar.earth plugin
+"""Soar plugin
 
 .. note:: This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -65,13 +65,13 @@ class SoarSourceSelectProvider(QgsSourceSelectProvider):
     # pylint: disable=missing-function-docstring,unused-argument
 
     def providerKey(self):
-        return 'soar.earth'
+        return 'soar'
 
     def text(self):
-        return SoarPlugin.tr('Soar.earth')
+        return SoarPlugin.tr('Soar')
 
     def toolTip(self):
-        return SoarPlugin.tr('Browse and search Soar.earth data')
+        return SoarPlugin.tr('Browse and search Soar data')
 
     def icon(self):
         return GuiUtils.get_icon('soar_logo.svg')
@@ -87,7 +87,7 @@ class SoarSourceSelectProvider(QgsSourceSelectProvider):
 
 class SoarPlugin:
     """
-    Soar.earth plugin
+    Soar plugin
     """
 
     def __init__(self, iface: QgisInterface):
@@ -115,18 +115,18 @@ class SoarPlugin:
         self.dock = BrowserDockWidget()
         self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
 
-        self.browse_action = QAction(self.tr("Show Soar.earth Browser"), self.iface.mainWindow())
+        self.browse_action = QAction(self.tr("Show Soar Browser"), self.iface.mainWindow())
         self.browse_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
         self.browse_action.setCheckable(True)
-        self.browse_action.setToolTip(self.tr('Browse and search Soar.earth data'))
+        self.browse_action.setToolTip(self.tr('Browse and search Soar data'))
         self.dock.setToggleVisibilityAction(self.browse_action)
 
         self.iface.pluginToolBar().addAction(self.browse_action)
 
-        self.export_map_action = QAction(self.tr("Export Map to Soar.earth"),
+        self.export_map_action = QAction(self.tr("Export Map to Soar"),
                                          self.iface.mainWindow())
         self.export_map_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
-        self.export_map_action.setToolTip(self.tr('Exports the current map to Soar.earth'))
+        self.export_map_action.setToolTip(self.tr('Exports the current map to Soar'))
         self.export_map_action.triggered.connect(self.export_map_to_soar)
         try:
             self.iface.addProjectExportAction(self.export_map_action)
@@ -210,7 +210,7 @@ class SoarPlugin:
         validator = MapValidator(QgsProject.instance())
         if not validator.validate():
             dialog = QgsMessageOutput.createMessageOutput()
-            dialog.setTitle(self.tr('Export Map to Soar.earth'))
+            dialog.setTitle(self.tr('Export Map to Soar'))
             dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageHtml)
             dialog.showMessage()
             return
@@ -259,7 +259,7 @@ class SoarPlugin:
                                    'modifications, you can re-upload.</p>')
 
         self.show_extended_message(self.tr('Map successful published'),
-                                   self.tr('Map Published to Soar.earth'),
+                                   self.tr('Map Published to Soar'),
                                    extended_message, level=Qgis.Success,
                                    button_text=self.tr("What's Next?"))
 
@@ -267,12 +267,12 @@ class SoarPlugin:
         """
         Triggered on a failed upload
         """
-        error_message = self.tr('<p>The upload to soar.earth failed.</p>'
+        error_message = self.tr('<p>The upload to Soar failed.</p>'
                                 '<p>The following error was raised:</p>'
                                 '<code>{}</code>'.format(error))
 
         self.show_extended_message(self.tr('Upload failed'),
-                                   self.tr('Soar.earth Upload Failed'),
+                                   self.tr('Soar Upload Failed'),
                                    error_message,
                                    level=Qgis.Critical)
 
@@ -288,7 +288,7 @@ class SoarPlugin:
             dialog.setMessage(long_message, QgsMessageOutput.MessageHtml)
             dialog.showMessage()
 
-        message_widget = self.iface.messageBar().createMessage(self.tr('Soar.earth'),
+        message_widget = self.iface.messageBar().createMessage(self.tr('Soar'),
                                                                short_message)
         if button_text is None:
             button_text = self.tr("Details")
