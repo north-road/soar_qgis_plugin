@@ -22,9 +22,11 @@ from qgis.PyQt.QtCore import (
     QEvent
 )
 from qgis.PyQt.QtWidgets import (
-    QAction
+    QAction,
+    QPushButton
 )
 from qgis.core import (
+    Qgis,
     QgsApplication,
     QgsProviderRegistry,
     QgsProject,
@@ -36,22 +38,21 @@ from qgis.gui import (
     QgisInterface
 )
 
-from .gui import (
-    GuiUtils,
-    MapExportDialog,
-    ConfirmExportDialog
-)
-from .gui.browser_dock_widget import BrowserDockWidget
-from .gui.data_source_widget import SoarDataSourceWidget
-from .gui import (
-    LOGIN_MANAGER
-)
-
 from .core import (
     ProjectManager,
     MapValidator,
     MapPublisher
 )
+from .gui import (
+    GuiUtils,
+    MapExportDialog,
+    ConfirmExportDialog
+)
+from .gui import (
+    LOGIN_MANAGER
+)
+from .gui.browser_dock_widget import BrowserDockWidget
+from .gui.data_source_widget import SoarDataSourceWidget
 
 
 class SoarSourceSelectProvider(QgsSourceSelectProvider):
@@ -115,7 +116,8 @@ class SoarPlugin:
 
         self.iface.pluginToolBar().addAction(self.browse_action)
 
-        self.export_map_action = QAction(self.tr("Export Map to Soar.earth"), self.iface.mainWindow())
+        self.export_map_action = QAction(self.tr("Export Map to Soar.earth"),
+                                         self.iface.mainWindow())
         self.export_map_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
         self.export_map_action.setToolTip(self.tr('Exports the current map to Soar.earth'))
         self.export_map_action.triggered.connect(self.export_map_to_soar)
@@ -193,7 +195,6 @@ class SoarPlugin:
 
         validator = MapValidator(QgsProject.instance())
         if not validator.validate():
-
             dialog = QgsMessageOutput.createMessageOutput()
             dialog.setTitle(self.tr('Export Map to Soar.earth'))
             dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageHtml)
@@ -219,10 +220,65 @@ class SoarPlugin:
                 return
 
             self.task = MapPublisher(settings, self.iface.mapCanvas())
+            self.task.success.connect(self._upload_success)
+            self.task.failed.connect(self._upload_failed)
 
             QgsApplication.taskManager().addTask(self.task)
-
 
         self.map_dialog.rejected.connect(dialog_rejected)
         self.map_dialog.accepted.connect(dialog_accepted)
         self.map_dialog.show()
+
+    def _upload_success(self):
+        """
+        Triggered on a successful upload
+        """
+
+        extended_message = self.tr('<p>Once your content has been approved by a moderator, you can '
+                                   'view it in your dashboard. Simply go to your dashboard, and '
+                                   'select ‘My Imagery’. You’ll see all of your uploaded maps, '
+                                   'including rejected items.</p>'
+                                   '<p>If your image is rejected, it’ll be returned with moderator '
+                                   'feedback to explain  why it wasn’t posted. If this happens, '
+                                   'simply click on the 3 dots in the top right '
+                                   'corner and select delete. Once you’ve made any necessary '
+                                   'modifications, you can re-upload.</p>')
+
+        self.show_extended_message(self.tr('Map successful published'),
+                                   self.tr('Map Published to Soar.earth'),
+                                   extended_message, level=Qgis.Success,
+                                   button_text=self.tr("What's Next?"))
+
+    def _upload_failed(self, error: str):
+        """
+        Triggered on a failed upload
+        """
+        error_message = self.tr('<p>The upload to soar.earth failed.</p>'
+                                '<p>The following error was raised:</p>'
+                                '<code>{}</code>'.format(error))
+
+        self.show_extended_message(self.tr('Upload failed'),
+                                   self.tr('Soar.earth Upload Failed'),
+                                   error_message,
+                                   level=Qgis.Critical)
+
+    def show_extended_message(self, short_message, title, long_message, level=Qgis.Warning,
+                              button_text=None):
+        """
+        Shows a warning via the QGIS message bar
+        """
+
+        def show_details(_):
+            dialog = QgsMessageOutput.createMessageOutput()
+            dialog.setTitle(title)
+            dialog.setMessage(long_message, QgsMessageOutput.MessageHtml)
+            dialog.showMessage()
+
+        message_widget = self.iface.messageBar().createMessage(self.tr('Soar.earth'),
+                                                               short_message)
+        if button_text is None:
+            button_text = self.tr("Details")
+        details_button = QPushButton(button_text)
+        details_button.clicked.connect(show_details)
+        message_widget.layout().addWidget(details_button)
+        self.iface.messageBar().pushWidget(message_widget, level, 0)
