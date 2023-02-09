@@ -42,4 +42,7 @@ class ConfirmExportDialog(base, ui):
         self.setWindowTitle(self.tr('Export Map to Soar.earth'))
 
     def _toggle_accept(self, accepted: bool):
+        """
+        Toggles the dialogs accept button enable status
+        """
         self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(accepted)

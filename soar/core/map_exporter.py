@@ -108,6 +108,10 @@ class MapExportSettings:
 
 
 class MapPublisher(QgsTask):
+    """
+    A background task for exporting maps and uploading to soar.earth
+    """
+
     success = pyqtSignal()
     failed = pyqtSignal(str)
 
@@ -117,7 +121,7 @@ class MapPublisher(QgsTask):
         self.settings = settings
         self.map_settings = self.settings.map_settings(canvas)
 
-        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=consider-using-with
         temp_path = Path(self.temp_dir.name)
         self.settings.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
 
@@ -130,13 +134,16 @@ class MapPublisher(QgsTask):
         self.upload_start_reply: Optional[QNetworkReply] = None
 
     def cleanup(self):
+        """
+        Cleanup temporary files following the export
+        """
         self.temp_dir.cleanup()
         self.temp_dir = None
 
-    def run(self) -> bool:
+    def run(self) -> bool:  # pylint: disable=missing-function-docstring
         self.georeference_output()
 
-        from .client import API_CLIENT
+        from .client import API_CLIENT  # pylint: disable=import-outside-toplevel
 
         self.upload_start_reply = API_CLIENT.request_upload_start(self.settings)
 
@@ -158,7 +165,7 @@ class MapPublisher(QgsTask):
         try:
             API_CLIENT.upload_file(self.settings.output_file_name, res)
             self.success.emit()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             self.failed.emit(str(e))
 
         self.cleanup()

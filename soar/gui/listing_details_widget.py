@@ -50,7 +50,7 @@ class ListingDetailsWidget(QgsPanelWidget):
 
     add_to_map = pyqtSignal(Listing)
 
-    def __init__(self, listing: Listing, parent=None):
+    def __init__(self, listing: Listing, parent=None):  # pylint: disable=too-many-statements
         super().__init__(parent)
 
         self.listing = listing

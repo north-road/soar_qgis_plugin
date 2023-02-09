@@ -44,7 +44,10 @@ class MapExportDialog(base, ui):
     A dialog for entering properties of a export to soar.earth
     """
 
-    def __init__(self, map_canvas: QgsMapCanvas, project_manager: ProjectManager, parent=None):
+    def __init__(self,  # pylint: disable=too-many-statements
+                 map_canvas: QgsMapCanvas,
+                 project_manager: ProjectManager,
+                 parent=None):
         super().__init__(parent)
 
         self.setupUi(self)
@@ -115,6 +118,9 @@ class MapExportDialog(base, ui):
         self.update_output_size()
 
     def update_output_width(self):
+        """
+        Updates the dialog state when output width changes
+        """
         width = self.mOutputWidthSpinBox.value()
 
         scale = width / self.size.width()
@@ -144,6 +150,9 @@ class MapExportDialog(base, ui):
         self.mExtentGroupBox.blockSignals(False)
 
     def update_output_height(self):
+        """
+        Updates the dialog state when output height changes
+        """
         height = self.mOutputHeightSpinBox.value()
 
         scale = height / self.size.height()
@@ -173,6 +182,9 @@ class MapExportDialog(base, ui):
         self.mExtentGroupBox.blockSignals(False)
 
     def update_extent(self, extent):
+        """
+        Updates the extent calculation
+        """
         if self.mExtentGroupBox.extentState() != QgsExtentGroupBox.UserExtent:
             current_dpi = self.dpi
 
@@ -203,12 +215,18 @@ class MapExportDialog(base, ui):
             self.mExtentGroupBox.setRatio(QSize(self.size.width(), self.size.height()))
 
     def update_dpi(self, dpi):
+        """
+        Updates the dialog state when output dpi changes
+        """
         self.size = QSize(int(round(self.size.width() * dpi / self.dpi)),
                           int(round(self.size.height() * dpi / self.dpi)))
         self.dpi = dpi
         self.update_output_size()
 
     def update_scale(self, scale):
+        """
+        Updates the dialog state when output scale changes
+        """
         calculator = QgsScaleCalculator()
         calculator.setMapUnits(self.mExtentGroupBox.currentCrs().mapUnits())
         calculator.setDpi(self.dpi)
@@ -221,6 +239,9 @@ class MapExportDialog(base, ui):
                                                      self.mExtentGroupBox.currentCrs())
 
     def lock_changed(self, locked: bool):
+        """
+        Updates the dialog state when ratio lock is changed
+        """
         if locked:
             self.mExtentGroupBox.setRatio(
                 QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value()))
@@ -228,6 +249,9 @@ class MapExportDialog(base, ui):
             self.mExtentGroupBox.setRatio(QSize(0, 0))
 
     def update_output_size(self):
+        """
+        Updates the size shown in the dialog
+        """
         self.mOutputWidthSpinBox.blockSignals(True)
         self.mOutputWidthSpinBox.setValue(self.size.width())
         self.mOutputWidthSpinBox.blockSignals(False)
@@ -288,7 +312,7 @@ class MapExportDialog(base, ui):
         self.project_manager.set_export_scale(export_settings.scale)
         self.project_manager.set_export_extent(export_settings.extent)
 
-    def accept(self):
+    def accept(self):  # pylint: disable=missing-function-docstring
         self.message_bar.clearWidgets()
 
         res, error = self.validate()

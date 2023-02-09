@@ -73,7 +73,7 @@ pylint:
 	@echo "-----------------"
 	@echo "Pylint violations"
 	@echo "-----------------"
-	@pylint --reports=n --rcfile=pylintrc $(PLUGIN_NAME)
+	@pylint --reports=n --rcfile=pylintrc --ignore-paths=soar/external/.* $(PLUGIN_NAME)
 	@echo
 	@echo "----------------------"
 	@echo "If you get a 'no module named qgis.core' error, try sourcing"

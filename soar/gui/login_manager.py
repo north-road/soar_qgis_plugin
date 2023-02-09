@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+"""soar.earth API client
+
+.. note:: This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+"""
+
+__author__ = '(C) 2022 by Nyall Dawson'
+__date__ = '22/11/2022'
+__copyright__ = 'Copyright 2022, North Road'
+# This will get replaced with a git SHA1 when you do a git archive
+__revision__ = '$Format:%H$'
+
 from enum import Enum
 
 from qgis.PyQt import sip
@@ -18,12 +33,19 @@ from ..core import API_CLIENT
 
 
 class LoginStatus(Enum):
+    """
+    Login statuses
+    """
     LoggedOut = 0
     LoggingIn = 1
     LoggedIn = 2
 
 
 class LoginManager(QObject):
+    """
+    Handles the GUI component of user login state
+    """
+
     logged_in = pyqtSignal()
     login_failed = pyqtSignal()
 
@@ -69,7 +91,7 @@ class LoginManager(QObject):
         if self.status != LoginStatus.LoggedOut:
             return False
 
-        from .credential_dialog import CredentialDialog
+        from .credential_dialog import CredentialDialog  # pylint: disable=import-outside-toplevel
         dlg = CredentialDialog()
         if not dlg.exec_():
             return False
@@ -88,6 +110,9 @@ class LoginManager(QObject):
         return False
 
     def _cleanup_messages(self):
+        """
+        Removes outdated message bar items
+        """
         if self._logging_in_message and not sip.isdeleted(self._logging_in_message):
             iface.messageBar().popWidget(self._logging_in_message)
             self._logging_in_message = None
@@ -96,20 +121,26 @@ class LoginManager(QObject):
             self._login_failed_message = None
 
     def _login_error_occurred(self, error: str):
+        """
+        Triggered when a login error occurs
+        """
         self._cleanup_messages()
 
         self.status = LoginStatus.LoggedOut
         login_error = self.tr('Login error: {}'.format(error))
 
         self._login_failed_message = QgsMessageBarItem(self.tr('Soar.earth'),
-                                                     login_error,
-                                                     Qgis.MessageLevel.Critical)
+                                                       login_error,
+                                                       Qgis.MessageLevel.Critical)
         iface.messageBar().pushItem(self._login_failed_message)
 
         self.queued_callbacks = []
         self.login_failed.emit()
 
     def _login_success(self):
+        """
+        Triggered when a login succeeds
+        """
         self._cleanup_messages()
 
         self.status = LoginStatus.LoggedIn
