@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>crcmod – CRC calculation &mdash; crcmod v1.7 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="crcmod v1.7 documentation" href="index.html" />
+    <link rel="next" title="crcmod.predefined – CRC calculation using predefined algorithms" href="crcmod.predefined.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="crcmod.predefined.html" title="crcmod.predefined – CRC calculation using predefined algorithms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">crcmod v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-crcmod">
+<h1><tt class="xref docutils literal"><span class="pre">crcmod</span></tt> &#8211; CRC calculation<a class="headerlink" href="#module-crcmod" title="Permalink to this headline">¶</a></h1>
+<p>This module provides a function factory <a title="crcmod.mkCrcFun" class="reference internal" href="#crcmod.mkCrcFun"><tt class="xref docutils literal"><span class="pre">mkCrcFun()</span></tt></a> and a class <a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a>
+for calculating CRCs of byte strings using common CRC algorithms.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>This documentation normally shows Python 2.x usage. Python 3.x usage is very similar,
+with the main difference that input strings must be explicitly defined as
+<tt class="xref docutils literal"><span class="pre">bytes</span></tt> type, or an object that supports the buffer protocol. E.g.:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">crc_value</span> <span class="o">=</span> <span class="n">crc_function</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;123456789&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc_value</span> <span class="o">=</span> <span class="n">crc_function</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">((</span><span class="mi">49</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">57</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="mkcrcfun-crc-function-factory">
+<h2><a title="crcmod.mkCrcFun" class="reference internal" href="#crcmod.mkCrcFun"><tt class="xref docutils literal"><span class="pre">mkCrcFun()</span></tt></a> &#8211; CRC function factory<a class="headerlink" href="#mkcrcfun-crc-function-factory" title="Permalink to this headline">¶</a></h2>
+<p>The function factory provides a simple interface for CRC calculation.</p>
+<dl class="function">
+<dt id="crcmod.mkCrcFun">
+<tt class="descclassname">crcmod.</tt><tt class="descname">mkCrcFun</tt><big>(</big><em>poly</em><span class="optional">[</span>, <em>initCrc</em>, <em>rev</em>, <em>xorOut</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.mkCrcFun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function factory that returns a new function for calculating CRCs
+using a specified CRC algorithm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>poly</em> &#8211; The generator polynomial to use in calculating the CRC.  The value
+is specified as a Python integer or long integer.  The bits in this integer
+are the coefficients of the polynomial.  The only polynomials allowed are
+those that generate 8, 16, 24, 32, or 64 bit CRCs.</li>
+<li><em>initCrc</em> &#8211; Initial value used to start the CRC calculation.  This initial
+value should be the initial shift register value, reversed if it uses a
+reversed algorithm, and then XORed with the final XOR value.  That is
+equivalent to the CRC result the algorithm should return for a
+zero-length string.  Defaults to all bits set because that starting value
+will take leading zero bytes into account.  Starting with zero will ignore
+all leading zero bytes.</li>
+<li><em>rev</em> &#8211; A flag that selects a bit reversed algorithm when <tt class="xref xref docutils literal"><span class="pre">True</span></tt>.  Defaults to
+<tt class="xref xref docutils literal"><span class="pre">True</span></tt> because the bit reversed algorithms are more efficient.</li>
+<li><em>xorOut</em> &#8211; Final value to XOR with the calculated CRC value.  Used by some
+CRC algorithms.  Defaults to zero.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">CRC calculation function</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">function</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The function that is returned is as follows:</p>
+<dl class="function">
+<dt id="crcmod..crc_function">
+<tt class="descclassname">.</tt><tt class="descname">crc_function</tt><big>(</big><em>data</em><span class="optional">[</span>, <em>crc=initCrc</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod..crc_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>data</em> (byte string) &#8211; Data for which to calculate the CRC.</li>
+<li><em>crc</em> &#8211; Initial CRC value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Calculated CRC value.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">integer</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p><strong>CRC-32</strong> Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">crcmod</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32_func</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">mkCrcFun</span><span class="p">(</span><span class="mh">0x104c11db7</span><span class="p">,</span> <span class="n">initCrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xorOut</span><span class="o">=</span><span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32_func</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="go">&#39;0xcbf43926L&#39;</span>
+</pre></div>
+</div>
+<p>The CRC-32 uses a &#8220;reversed&#8221; algorithm, used for many common CRC algorithms.
+Less common is the non-reversed algorithm, as used by the 16-bit <strong>XMODEM</strong> CRC:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">xmodem_crc_func</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">mkCrcFun</span><span class="p">(</span><span class="mh">0x11021</span><span class="p">,</span> <span class="n">rev</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">initCrc</span><span class="o">=</span><span class="mh">0x0000</span><span class="p">,</span> <span class="n">xorOut</span><span class="o">=</span><span class="mh">0x0000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">xmodem_crc_func</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="go">&#39;0x31c3&#39;</span>
+</pre></div>
+</div>
+<p>The CRC function can be called multiple times. On subsequent calls, pass the
+CRC value previously calculated as a second parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">crc_value</span> <span class="o">=</span> <span class="n">crc32_func</span><span class="p">(</span><span class="s">&#39;1234&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc_value</span> <span class="o">=</span> <span class="n">crc32_func</span><span class="p">(</span><span class="s">&#39;56789&#39;</span><span class="p">,</span> <span class="n">crc_value</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc_value</span><span class="p">)</span>
+<span class="go">&#39;0xcbf43926L&#39;</span>
+</pre></div>
+</div>
+<p>Python 3.x example: Unicode strings are not accepted as input. Byte strings are acceptable.
+You may calculate a CRC for an object that implements the buffer protocol:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">crcmod</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32_func</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">mkCrcFun</span><span class="p">(</span><span class="mh">0x104c11db7</span><span class="p">,</span> <span class="n">initCrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xorOut</span><span class="o">=</span><span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32_func</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="go">TypeError: Unicode-objects must be encoded before calculating a CRC</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32_func</span><span class="p">(</span><span class="n">b</span><span class="s">&#39;123456789&#39;</span><span class="p">))</span>
+<span class="go">&#39;0xcbf43926&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32_func</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">((</span><span class="mi">49</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">54</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">57</span><span class="p">))))</span>
+<span class="go">&#39;0xcbf43926&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="class-crc">
+<h2>Class <a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a><a class="headerlink" href="#class-crc" title="Permalink to this headline">¶</a></h2>
+<p>The class provides an interface similar to the Python <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/hashlib.html#module-hashlib"><tt class="xref docutils literal"><span class="pre">hashlib</span></tt></a>, <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/md5.html#module-md5"><tt class="xref docutils literal"><span class="pre">md5</span></tt></a> and <a title="(in Python v2.6)" class="reference external" href="http://docs.python.org/library/sha.html#module-sha"><tt class="xref docutils literal"><span class="pre">sha</span></tt></a> modules.</p>
+<dl class="class">
+<dt id="crcmod.Crc">
+<em class="property">class </em><tt class="descclassname">crcmod.</tt><tt class="descname">Crc</tt><big>(</big><em>poly</em><span class="optional">[</span>, <em>initCrc</em>, <em>rev</em>, <em>xorOut</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.Crc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> object for calculating CRCs using a specified CRC algorithm.</p>
+<p>The parameters are the same as those for the factory function <a title="crcmod.mkCrcFun" class="reference internal" href="#crcmod.mkCrcFun"><tt class="xref docutils literal"><span class="pre">mkCrcFun()</span></tt></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>poly</em> &#8211; The generator polynomial to use in calculating the CRC.  The value
+is specified as a Python integer or long integer.  The bits in this integer
+are the coefficients of the polynomial.  The only polynomials allowed are
+those that generate 8, 16, 24, 32, or 64 bit CRCs.</li>
+<li><em>initCrc</em> &#8211; Initial value used to start the CRC calculation.  This initial
+value should be the initial shift register value, reversed if it uses a
+reversed algorithm, and then XORed with the final XOR value.  That is
+equivalent to the CRC result the algorithm should return for a
+zero-length string.  Defaults to all bits set because that starting value
+will take leading zero bytes into account.  Starting with zero will ignore
+all leading zero bytes.</li>
+<li><em>rev</em> &#8211; A flag that selects a bit reversed algorithm when <tt class="xref xref docutils literal"><span class="pre">True</span></tt>.  Defaults to
+<tt class="xref xref docutils literal"><span class="pre">True</span></tt> because the bit reversed algorithms are more efficient.</li>
+<li><em>xorOut</em> &#8211; Final value to XOR with the calculated CRC value.  Used by some
+CRC algorithms.  Defaults to zero.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> objects contain the following constant values:</p>
+<dl class="attribute">
+<dt id="crcmod.Crc.digest_size">
+<tt class="descname">digest_size</tt><a class="headerlink" href="#crcmod.Crc.digest_size" title="Permalink to this definition">¶</a></dt>
+<dd>The size of the resulting digest in bytes. This depends on the width of the CRC polynomial.
+E.g. for a 32-bit CRC, <a title="crcmod.Crc.digest_size" class="reference internal" href="#crcmod.Crc.digest_size"><tt class="xref docutils literal"><span class="pre">digest_size</span></tt></a> will be <tt class="docutils literal"><span class="pre">4</span></tt>.</dd></dl>
+
+<dl class="attribute">
+<dt id="crcmod.Crc.crcValue">
+<tt class="descname">crcValue</tt><a class="headerlink" href="#crcmod.Crc.crcValue" title="Permalink to this definition">¶</a></dt>
+<dd>The calculated CRC value, as an integer, for the data that has been input
+using <a title="crcmod.Crc.update" class="reference internal" href="#crcmod.Crc.update"><tt class="xref docutils literal"><span class="pre">update()</span></tt></a>. This value is updated after each call to <a title="crcmod.Crc.update" class="reference internal" href="#crcmod.Crc.update"><tt class="xref docutils literal"><span class="pre">update()</span></tt></a>.</dd></dl>
+
+<p><a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> objects support the following methods:</p>
+<dl class="method">
+<dt id="crcmod.Crc.new">
+<tt class="descname">new</tt><big>(</big><span class="optional">[</span><em>arg</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.Crc.new" title="Permalink to this definition">¶</a></dt>
+<dd>Create a new instance of the <a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> class initialized to the same
+values as the original instance.  The CRC value is set to the initial
+value.  If a string is provided in the optional <tt class="docutils literal"><span class="pre">arg</span></tt> parameter, it is
+passed to the <a title="crcmod.Crc.update" class="reference internal" href="#crcmod.Crc.update"><tt class="xref docutils literal"><span class="pre">update()</span></tt></a> method.</dd></dl>
+
+<dl class="method">
+<dt id="crcmod.Crc.copy">
+<tt class="descname">copy</tt><big>(</big><big>)</big><a class="headerlink" href="#crcmod.Crc.copy" title="Permalink to this definition">¶</a></dt>
+<dd>Create a new instance of the <a title="crcmod.Crc" class="reference internal" href="#crcmod.Crc"><tt class="xref docutils literal"><span class="pre">Crc</span></tt></a> class initialized to the same
+values as the original instance.  The CRC value is copied from the current
+value.  This allows multiple CRC calculations using a common initial
+string.</dd></dl>
+
+<dl class="method">
+<dt id="crcmod.Crc.update">
+<tt class="descname">update</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#crcmod.Crc.update" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameter:</th><td class="field-body"><em>data</em> (byte string) &#8211; Data for which to calculate the CRC</td>
+</tr>
+</tbody>
+</table>
+<p>Update the calculated CRC value for the specified input data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="crcmod.Crc.digest">
+<tt class="descname">digest</tt><big>(</big><big>)</big><a class="headerlink" href="#crcmod.Crc.digest" title="Permalink to this definition">¶</a></dt>
+<dd>Return the current CRC value as a string of bytes.  The length of
+this string is specified in the <a title="crcmod.Crc.digest_size" class="reference internal" href="#crcmod.Crc.digest_size"><tt class="xref docutils literal"><span class="pre">digest_size</span></tt></a> attribute.</dd></dl>
+
+<dl class="method">
+<dt id="crcmod.Crc.hexdigest">
+<tt class="descname">hexdigest</tt><big>(</big><big>)</big><a class="headerlink" href="#crcmod.Crc.hexdigest" title="Permalink to this definition">¶</a></dt>
+<dd>Return the current CRC value as a string of hex digits.  The length
+of this string is twice the <a title="crcmod.Crc.digest_size" class="reference internal" href="#crcmod.Crc.digest_size"><tt class="xref docutils literal"><span class="pre">digest_size</span></tt></a> attribute.</dd></dl>
+
+<dl class="method">
+<dt id="crcmod.Crc.generateCode">
+<tt class="descname">generateCode</tt><big>(</big><em>functionName</em>, <em>out</em><span class="optional">[</span>, <em>dataType</em>, <em>crcType</em><span class="optional">]</span><big>)</big><a class="headerlink" href="#crcmod.Crc.generateCode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a C/C++ function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>functionName</em> &#8211; String specifying the name of the function.</li>
+<li><em>out</em> &#8211; An open file-like object with a write method.
+This specifies where the generated code is written.</li>
+<li><em>dataType</em> &#8211; An optional parameter specifying the data type of the input
+data to the function.  Defaults to <tt class="docutils literal"><span class="pre">UINT8</span></tt>.</li>
+<li><em>crcType</em> &#8211; An optional parameter specifying the data type of the CRC value.
+Defaults to one of <tt class="docutils literal"><span class="pre">UINT8</span></tt>, <tt class="docutils literal"><span class="pre">UINT16</span></tt>, <tt class="docutils literal"><span class="pre">UINT32</span></tt>, or <tt class="docutils literal"><span class="pre">UINT64</span></tt> depending
+on the size of the CRC value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="id1">
+<h3>Examples<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><strong>CRC-32</strong> Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">crcmod</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span> <span class="o">=</span> <span class="n">crcmod</span><span class="o">.</span><span class="n">Crc</span><span class="p">(</span><span class="mh">0x104c11db7</span><span class="p">,</span> <span class="n">initCrc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xorOut</span><span class="o">=</span><span class="mh">0xFFFFFFFF</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;123456789&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">hex</span><span class="p">(</span><span class="n">crc32</span><span class="o">.</span><span class="n">crcValue</span><span class="p">)</span>
+<span class="go">&#39;0xcbf43926L&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;CBF43926&#39;</span>
+</pre></div>
+</div>
+<p>The <a title="crcmod.Crc.update" class="reference internal" href="#crcmod.Crc.update"><tt class="xref docutils literal"><span class="pre">Crc.update()</span></tt></a> method can be called multiple times, and the CRC value is updated with each call:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">crc32new</span> <span class="o">=</span> <span class="n">crc32</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32new</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;1234&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32new</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;9BE3E0A3&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32new</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="s">&#39;56789&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">crc32new</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+<span class="go">&#39;CBF43926&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#"><tt class="docutils literal"><span class="pre">crcmod</span></tt> &#8211; CRC calculation</a><ul>
+<li><a class="reference external" href="#mkcrcfun-crc-function-factory"><tt class="docutils literal"><span class="pre">mkCrcFun()</span></tt> &#8211; CRC function factory</a><ul>
+<li><a class="reference external" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#class-crc">Class <tt class="docutils literal"><span class="pre">Crc</span></tt></a><ul>
+<li><a class="reference external" href="#id1">Examples</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="intro.html"
+                                  title="previous chapter">Introduction</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="crcmod.predefined.html"
+                                  title="next chapter"><tt class="docutils literal"><span class="pre">crcmod.predefined</span></tt> &#8211; CRC calculation using predefined algorithms</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/crcmod.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="crcmod.predefined.html" title="crcmod.predefined – CRC calculation using predefined algorithms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">crcmod v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Raymond L Buvel.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>
