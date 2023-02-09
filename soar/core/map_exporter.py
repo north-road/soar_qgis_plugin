@@ -20,10 +20,10 @@ from typing import List, Optional
 from osgeo import gdal
 from qgis.PyQt.QtCore import (
     QSize,
-    QEventLoop
+    QEventLoop,
+    pyqtSignal
 )
 from qgis.PyQt.QtNetwork import QNetworkReply
-
 from qgis.core import (
     Qgis,
     QgsProject,
@@ -108,6 +108,8 @@ class MapExportSettings:
 
 
 class MapPublisher(QgsTask):
+    success = pyqtSignal()
+    failed = pyqtSignal(str)
 
     def __init__(self, settings: MapExportSettings, canvas: QgsMapCanvas):
         super().__init__('Publishing map to Soar.earth', QgsTask.Flag.CanCancel)
@@ -120,7 +122,8 @@ class MapPublisher(QgsTask):
         self.settings.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
 
         self.addSubTask(
-            QgsMapRendererTask(self.map_settings, self.settings.output_file_name, fileFormat='TIF'),
+            QgsMapRendererTask(self.map_settings, self.settings.output_file_name,
+                               fileFormat='TIF'),
             subTaskDependency=QgsTask.ParentDependsOnSubTask
         )
 
@@ -141,14 +144,22 @@ class MapPublisher(QgsTask):
         self.upload_start_reply.finished.connect(loop.quit)
         loop.exec()
 
-        res = API_CLIENT.parse_request_upload_reply(self.upload_start_reply)
+        res, error = API_CLIENT.parse_request_upload_reply(self.upload_start_reply)
         self.upload_start_reply = None
 
         if res is None:
             # error occurred
+            if error:
+                self.failed.emit(error)
+
+            self.cleanup()
             return False
 
-        API_CLIENT.upload_file(self.settings.output_file_name,res)
+        try:
+            API_CLIENT.upload_file(self.settings.output_file_name, res)
+            self.success.emit()
+        except Exception as e:
+            self.failed.emit(str(e))
 
         self.cleanup()
         return True

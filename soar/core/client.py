@@ -18,7 +18,8 @@ from enum import Enum
 from typing import (
     Optional,
     List,
-    Dict
+    Dict,
+    Tuple
 )
 from pathlib import Path
 
@@ -434,7 +435,6 @@ class ApiClient(QObject):
     error_occurred = pyqtSignal(str)
     login_error_occurred = pyqtSignal(str)
     fetched_token = pyqtSignal()
-    upload_error_occurred = pyqtSignal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -607,18 +607,18 @@ class ApiClient(QObject):
         return QgsNetworkAccessManager.instance().post(request, json.dumps(params).encode())
 
     def parse_request_upload_reply(self,
-                                   reply: QNetworkReply) -> Optional[Dict]:
+                                   reply: QNetworkReply) -> Tuple[Optional[Dict], Optional[str]]:
         """
         Parses a request upload reply
         """
         if sip.isdeleted(self):
-            return None
+            return None, None
 
         if not reply or sip.isdeleted(reply):
-            return None
+            return None, None
 
         if reply.error() == QNetworkReply.OperationCanceledError:
-            return None
+            return None, None
 
         if reply.error() != QNetworkReply.NoError:
             reply_json = json.loads(reply.readAll().data().decode())
@@ -627,10 +627,9 @@ class ApiClient(QObject):
             if not error:
                 error = reply.errorString()
 
-            self.upload_error_occurred.emit(error)
-            return None
+            return None, error
 
-        return json.loads(reply.readAll().data().decode())
+        return json.loads(reply.readAll().data().decode()), None
 
     def upload_file(self, file_path: str, upload_details: Dict):
         """
