@@ -252,14 +252,17 @@ class ApiClientTest(unittest.TestCase):
         """
         listing = Listing()
         listing.min_zoom = 15
-        listing.geometry = QgsGeometry.fromWkt('Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
+        listing.geometry = QgsGeometry.fromWkt(
+            'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
         listing.tile_url = 'https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1'
 
-        self.assertEqual(listing.to_qgis_layer_source_string(), 'type=xyz&url=https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z%3D%7Bz%7D%26x%3D%7Bx%7D%26y%3D%7B-y%7D%26access_token%3DeyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw%26dom%3D1&zmin=15')
+        self.assertEqual(listing.to_qgis_layer_source_string(),
+                         'type=xyz&url=https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z%3D%7Bz%7D%26x%3D%7Bx%7D%26y%3D%7B-y%7D%26access_token%3DeyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw%26dom%3D1&zmin=15')
 
         layer = listing.to_qgis_layer()
         self.assertEqual(layer.providerType(), 'wms')
-        self.assertEqual(layer.source(), 'type=xyz&url=https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z%3D%7Bz%7D%26x%3D%7Bx%7D%26y%3D%7B-y%7D%26access_token%3DeyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw%26dom%3D1&zmin=15')
+        self.assertEqual(layer.source(),
+                         'type=xyz&url=https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z%3D%7Bz%7D%26x%3D%7Bx%7D%26y%3D%7B-y%7D%26access_token%3DeyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw%26dom%3D1&zmin=15')
         self.assertAlmostEqual(layer.extent().xMinimum(), 5343335, -3)
         self.assertAlmostEqual(layer.extent().xMaximum(), 5354467, -3)
         self.assertAlmostEqual(layer.extent().yMinimum(), 4579425, -3)
@@ -321,6 +324,20 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(len(self._result), 2)
         self.assertEqual(self._result[0].id, 10465)
         self.assertEqual(self._result[1].id, 10464)
+
+    def test_aoi(self):
+        """
+        Test aoi WKT generation
+        """
+        query = ListingQuery()
+        query.aoi = QgsGeometry.fromWkt(
+            'Polygon ((17820279 -4473060, 17066712 -4972615, 17401161 -5400201, 18463774 -5281662, 17820279 -4473060))')
+        params = query.to_query_parameters()
+        self.assertEqual(params, {
+            'aoi': 'POLYGON ((17820279 -4473060, 17066712 -4972615, 17401161 -5400201, '
+                   '18463774 -5281662, 17820279 -4473060))',
+            'limit': 50,
+            'listingType': 'TILE_LAYER'})
 
     def test_listing_request(self):
         """

@@ -34,7 +34,8 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsGeometry,
-    QgsCsException
+    QgsCsException,
+    QgsRectangle
 )
 from qgis.gui import (
     QgsFilterLineEdit,
@@ -156,6 +157,21 @@ class BrowseWidget(QWidget):
             # close polygon
             visible_polygon.append(visible_polygon.at(0))
             polygon_map = QgsGeometry.fromQPolygonF(visible_polygon)
+
+            # we need to intersect the polygon with world extent
+            world_extent_wgs84 = QgsGeometry.fromRect(QgsRectangle(-180,-90, 180, 90))
+            world_extent_wgs84 = world_extent_wgs84.densifyByCount(50)
+
+            try:
+                wgs84_transform = QgsCoordinateTransform(QgsCoordinateReferenceSystem('EPSG:4326'),
+                                                   iface.mapCanvas().mapSettings().destinationCrs(),
+                                                   QgsProject.instance().transformContext())
+                transformed_world = world_extent_wgs84
+                transformed_world.transform(wgs84_transform)
+                polygon_map = polygon_map.intersection(transformed_world)
+            except QgsCsException:
+                pass
+
             try:
                 polygon_map.transform(transform)
                 query.aoi = polygon_map
