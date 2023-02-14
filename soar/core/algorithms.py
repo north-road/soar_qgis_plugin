@@ -34,6 +34,7 @@ from qgis.core import (
 )
 
 from .map_exporter import MapExportSettings
+from ..gui import GuiUtils
 
 
 class PublishRasterToSoar(QgsProcessingAlgorithm):
@@ -103,6 +104,12 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
 
     def shortHelpString(self):
         return "Publishes a GeoTIFF dataset to Soar"
+
+    def icon(self):
+        return GuiUtils.get_icon('soar_export.svg')
+
+    def svgIconPath(self):
+        return GuiUtils.get_icon_svg('soar_export.svg')
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterRasterLayer(
