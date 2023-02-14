@@ -95,6 +95,7 @@ class SoarPlugin:
 
         self.dock: Optional[BrowserDockWidget] = None
         self.browse_action: Optional[QAction] = None
+        self.add_soar_layer_action: Optional[QAction] = None
         self.export_map_action: Optional[QAction] = None
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
@@ -122,6 +123,12 @@ class SoarPlugin:
         self.dock.setToggleVisibilityAction(self.browse_action)
 
         self.iface.pluginToolBar().addAction(self.browse_action)
+
+        self.add_soar_layer_action = QAction(self.tr("Add Soar Layer…"), self.iface.mainWindow())
+        self.add_soar_layer_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
+        self.add_soar_layer_action.setToolTip(self.tr('Browse and search Soar data'))
+        self.add_soar_layer_action.triggered.connect(self._add_soar_layer)
+        self.iface.addLayerMenu().addAction(self.add_soar_layer_action)
 
         self.export_map_action = QAction(self.tr("Export Map to Soar"),
                                          self.iface.mainWindow())
@@ -164,11 +171,12 @@ class SoarPlugin:
             self.dock.deleteLater()
         self.dock = None
 
-        for action in (self.browse_action, self.export_map_action):
+        for action in (self.browse_action, self.export_map_action, self.add_soar_layer_action):
             if not sip.isdeleted(action):
                 action.deleteLater()
         self.browse_action = None
         self.export_map_action = None
+        self.add_soar_layer_action = None
 
         if self.source_select_provider and not sip.isdeleted(self.source_select_provider):
             QgsGui.sourceSelectProviderRegistry().removeProvider(self.source_select_provider)
@@ -296,3 +304,14 @@ class SoarPlugin:
         details_button.clicked.connect(show_details)
         message_widget.layout().addWidget(details_button)
         self.iface.messageBar().pushWidget(message_widget, level, 0)
+
+    def _add_soar_layer(self):
+        """
+        Tries to open the soar page in data source manager if possible, else just opens the
+        soar dock
+        """
+        try:
+            # requires QGIS 3.30+
+            self.iface.openDataSourceManagerPage('soar')
+        except AttributeError:
+            self.dock.setUserVisible(True)
