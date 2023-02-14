@@ -135,6 +135,8 @@ class SoarPlugin:
         self.export_map_action.setIcon(GuiUtils.get_icon('soar_export.svg'))
         self.export_map_action.setToolTip(self.tr('Exports the current map to Soar'))
         self.export_map_action.triggered.connect(self.export_map_to_soar)
+        self.iface.pluginToolBar().addAction(self.export_map_action)
+
         try:
             self.iface.addProjectExportAction(self.export_map_action)
         except AttributeError:
