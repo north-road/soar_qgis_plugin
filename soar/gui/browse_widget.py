@@ -159,7 +159,9 @@ class BrowseWidget(QWidget):
             polygon_map = QgsGeometry.fromQPolygonF(visible_polygon)
 
             # we need to intersect the polygon with world extent
-            world_extent_wgs84 = QgsGeometry.fromRect(QgsRectangle(-180,-90, 180, 90))
+            world_extent_wgs84 = QgsGeometry.fromRect(
+                QgsRectangle(-180, -90, 180, 90)
+            )
             world_extent_wgs84 = world_extent_wgs84.densifyByCount(50)
 
             try:
