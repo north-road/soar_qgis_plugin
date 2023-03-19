@@ -67,6 +67,14 @@ class ProjectManager(QObject):
         if not soar_layer_id:
             return  # don't care about this layer
 
+        # restore real layer extent
+        x_min = layer.customProperty('_real_extent_x_min')
+        y_min = layer.customProperty('_real_extent_y_min')
+        x_max = layer.customProperty('_real_extent_x_max')
+        y_max = layer.customProperty('_real_extent_y_max')
+        if x_min is not None:
+            layer.setExtent(QgsRectangle(x_min, y_min, x_max, y_max))
+
         soar_layer_expiry = QDateTime.fromString(layer.customProperty('_soar_layer_expiry'),
                                                  Qt.ISODate)
         remaining_days = QDateTime.currentDateTime().daysTo(soar_layer_expiry)
@@ -94,7 +102,12 @@ class ProjectManager(QObject):
         full_listing = API_CLIENT.parse_listing_reply(reply)
 
         new_uri = full_listing.to_qgis_layer_source_string()
+        # we've overridden the layer's extent from its default
+        # This will be reset on the call to setDataSource, so we need to restore
+        # the existing extent
+        old_extent = layer.extent()
         layer.setDataSource(new_uri, layer.name(), 'wms')
+        layer.setExtent(old_extent)
 
         layer.setCustomProperty('_soar_layer_expiry',
                                 full_listing.tile_url_expiry_at.toString(Qt.ISODate))

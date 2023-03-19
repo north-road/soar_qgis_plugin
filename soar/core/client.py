@@ -309,6 +309,14 @@ class Listing:
                 QgsCoordinateReferenceSystem('EPSG:3857'),
                 QgsProject.instance())
             extent_3857 = transform.transformBoundingBox(self.geometry.boundingBox())
+            layer.setCustomProperty('_real_extent_x_min',
+                                    extent_3857.xMinimum())
+            layer.setCustomProperty('_real_extent_y_min',
+                                    extent_3857.yMinimum())
+            layer.setCustomProperty('_real_extent_x_max',
+                                    extent_3857.xMaximum())
+            layer.setCustomProperty('_real_extent_y_max',
+                                    extent_3857.yMaximum())
             layer.setExtent(extent_3857)
 
         layer.setMetadata(self.to_layer_metadata())
