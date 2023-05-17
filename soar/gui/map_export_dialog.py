@@ -115,6 +115,8 @@ class MapExportDialog(base, ui):
         self.mScaleWidget.scaleChanged.connect(self.update_scale)
         self.mLockAspectRatio.lockChanged.connect(self.lock_changed)
 
+        self.mLockAspectRatio.setLocked(True)
+
         self.update_output_size()
 
     def update_output_width(self):
