@@ -260,7 +260,7 @@ class SoarPlugin:
 
         extended_message = self.tr('<p>Once your content has been approved by a moderator, you can '
                                    'view it in your dashboard. Simply go to your dashboard, and '
-                                   'select ‘My Imagery’. You’ll see all of your uploaded maps, '
+                                   'select ‘My Maps’. You’ll see all of your uploaded maps, '
                                    'including rejected items.</p>'
                                    '<p>If your image is rejected, it’ll be returned with moderator '
                                    'feedback to explain  why it wasn’t posted. If this happens, '
