@@ -52,7 +52,7 @@ class CredentialDialog(base, ui):
         """
         is_valid = bool(self.username() and self.password())
 
-        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(is_valid)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(is_valid)
 
     def accept(self):  # pylint: disable=missing-function-docstring
         QgsSettings().setValue('soar/username', self.username())

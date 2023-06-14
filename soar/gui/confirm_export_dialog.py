@@ -33,9 +33,9 @@ class ConfirmExportDialog(base, ui):
 
         self.setupUi(self)
 
-        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setText(self.tr('Publish'))
+        self.button_box.button(QDialogButtonBox.Ok).setText(self.tr('Publish'))
 
-        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(False)
 
         self.check_accept.toggled.connect(self._toggle_accept)
 
@@ -45,4 +45,4 @@ class ConfirmExportDialog(base, ui):
         """
         Toggles the dialogs accept button enable status
         """
-        self.button_box.button(QDialogButtonBox.StandardButton.Ok).setEnabled(accepted)
+        self.button_box.button(QDialogButtonBox.Ok).setEnabled(accepted)

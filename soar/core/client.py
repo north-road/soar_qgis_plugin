@@ -209,12 +209,14 @@ class Listing:
 
             return layer_uri
 
-        elif self.listing_type == ListingType.Wms:
+        if self.listing_type == ListingType.Wms:
             source_uri = self.server_url
             if not source_uri:
                 return None
             layer_uri = f'contextualWMSLegend=0&crs=EPSG:3857&format=image/png&layers={self.layer_name}&styles=&tilePixelRatio=0&url={source_uri}'
             return layer_uri
+
+        return None
 
     def to_layer_metadata(self) -> Optional[QgsLayerMetadata]:  # pylint: disable=too-many-branches,too-many-statements
         """
