@@ -13,6 +13,8 @@ __copyright__ = 'Copyright 2022, North Road'
 # This will get replaced with a git SHA1 when you do a git archive
 __revision__ = '$Format:%H$'
 
+import re
+
 from qgis.PyQt.QtCore import (
     QEventLoop
 )
@@ -212,7 +214,8 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         description = self.parameterAsString(parameters, self.DESCRIPTION, context)
         if not description:
             raise QgsProcessingException('A description is required')
-        tags = self.parameterAsString(parameters, self.TAGS, context).split(';')
+        tags = re.split(r'[,;]',
+                        self.parameterAsString(parameters, self.TAGS, context))
         if not tags:
             raise QgsProcessingException('Some tags are required')
 

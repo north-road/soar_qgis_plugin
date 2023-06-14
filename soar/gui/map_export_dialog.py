@@ -14,6 +14,7 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 from typing import Tuple
+import re
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import (
@@ -330,7 +331,7 @@ class MapExportDialog(base, ui):
 
         export_settings.title = self.map_title_edit.text()
         export_settings.description = self.description_edit.toPlainText()
-        export_settings.tags = self.tags_edit.text().split(';')
+        export_settings.tags = re.split(r'[,;]', self.tags_edit.text())
         export_settings.categories = [cat for cat in (
             self.category_combo.currentData(),
             self.category_combo_2.currentData(),
