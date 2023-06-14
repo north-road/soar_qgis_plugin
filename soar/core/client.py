@@ -171,6 +171,9 @@ class Listing:
         self.geometry: Optional[QgsGeometry] = None
         self.updated_at: QDateTime = QDateTime()
         self.tile_url: Optional[str] = None
+        self.server_url: Optional[str] = None
+        self.layer_name: Optional[str] = None
+        self.layer_crs: Optional[str] = None
         self.file_size: Optional[int] = None
         self.domain_name: Optional[str] = None
         self.files: List[str] = []
@@ -189,21 +192,29 @@ class Listing:
         """
         Returns a qgis layer source string file the listing
         """
-        source_uri = self.tile_url
-        if not source_uri:
-            return None
+        if self.listing_type == ListingType.TileLayer:
+            source_uri = self.tile_url
+            if not source_uri:
+                return None
 
-        source_uri = source_uri.replace('{y}', '{-y}')
-        source_uri = source_uri.replace('&', '%26')
-        source_uri = source_uri.replace('=', '%3D')
-        source_uri = source_uri.replace('{', '%7B')
-        source_uri = source_uri.replace('}', '%7D')
+            source_uri = source_uri.replace('{y}', '{-y}')
+            source_uri = source_uri.replace('&', '%26')
+            source_uri = source_uri.replace('=', '%3D')
+            source_uri = source_uri.replace('{', '%7B')
+            source_uri = source_uri.replace('}', '%7D')
 
-        layer_uri = f"type=xyz&url={source_uri}"
-        if self.min_zoom is not None:
-            layer_uri += f'&zmin={self.min_zoom}'
+            layer_uri = f"type=xyz&url={source_uri}"
+            if self.min_zoom is not None:
+                layer_uri += f'&zmin={self.min_zoom}'
 
-        return layer_uri
+            return layer_uri
+
+        elif self.listing_type == ListingType.Wms:
+            source_uri = self.server_url
+            if not source_uri:
+                return None
+            layer_uri = f'contextualWMSLegend=0&crs=EPSG:3857&format=image/png&layers={self.layer_name}&styles=&tilePixelRatio=0&url={source_uri}'
+            return layer_uri
 
     def to_layer_metadata(self) -> Optional[QgsLayerMetadata]:  # pylint: disable=too-many-branches,too-many-statements
         """
@@ -377,6 +388,9 @@ class Listing:
             res.geometry = QgsGeometry.fromWkt(wkt)
 
         res.tile_url = input_json.get('tileUrl')
+        res.server_url = input_json.get('serverUrl')
+        res.layer_name = input_json.get('layerName')
+        res.layer_crs = input_json.get('layerSrs')
         file_size = input_json.get('filesize')
         if file_size is not None:
             res.file_size = int(file_size)
@@ -401,7 +415,7 @@ class ListingQuery:
 
     def __init__(self,
                  user_id: Optional[str] = None,
-                 listing_type: Optional[ListingType] = None,
+                 listing_types: Optional[List[ListingType]] = None,
                  order_by: Optional[OrderBy] = None,
                  aoi: Optional[QgsGeometry] = None,
                  keywords: Optional[str] = None,
@@ -411,8 +425,8 @@ class ListingQuery:
                  offset: int = 0):
         self.user_id: Optional[str] = user_id
         # default to filtering to tile layers only
-        self.listing_type: Optional[
-            ListingType] = listing_type if listing_type is not None else ListingType.TileLayer
+        self.listing_types: List[ListingType] = listing_types or \
+                                                [ListingType.TileLayer, ListingType.Wms]
         self.order_by: Optional[OrderBy] = order_by
         self.aoi: Optional[QgsGeometry] = aoi
         self.keywords: Optional[str] = keywords
@@ -434,8 +448,10 @@ class ListingQuery:
             params['limit'] = self.limit
         if self.offset:
             params['offset'] = self.offset
-        if self.listing_type:
-            params['listingType'] = ListingType.to_string(self.listing_type)
+        if self.listing_types:
+            params['listingType'] = ','.join(
+                [ListingType.to_string(l) for l in self.listing_types]
+            )
         if self.order_by:
             params['orderBy'] = OrderBy.to_string(self.order_by)
         if self.category:

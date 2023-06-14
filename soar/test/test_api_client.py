@@ -276,14 +276,14 @@ class ApiClientTest(unittest.TestCase):
 
         query = ListingQuery(limit=2, keywords='flood',
                              user_id='4515f58126704ae4831ffa9d66c395d7')
-        query.listing_type = None
+        query.listing_types = None
         request = client.request_listings(query)
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&userId=4515f58126704ae4831ffa9d66c395d7&limit=2')
         self.assertEqual(request.rawHeader(b'Subdomain'), b'soar.earth')
 
         query = ListingQuery(
-            listing_type=ListingType.Wms,
+            listing_types=[ListingType.Wms],
             order_by=OrderBy.Comments,
             keywords='flood',
             category='categ',
@@ -293,6 +293,19 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS&orderBy=COMMENTS&category=categ&featured=feat')
+
+        query = ListingQuery(
+            listing_types=[ListingType.Wms, ListingType.TileLayer],
+            order_by=OrderBy.Comments,
+            keywords='flood',
+            category='categ',
+            featured='feat',
+            offset=5)
+        request = client.request_listings(query, domain='test.earth')
+        self.assertEqual(request.rawHeader(b'Subdomain'), b'test.earth')
+        self.assertEqual(request.url().toString(),
+                         'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS,TILE_LAYER&orderBy=COMMENTS&category=categ&featured=feat')
+
 
         query = ListingQuery(aoi=QgsGeometry.fromWkt(
             'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))

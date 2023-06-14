@@ -201,26 +201,25 @@ class BrowseWidget(QWidget):
         """
         Called when a listing should be added to the map
         """
-        if listing.listing_type != ListingType.TileLayer:
-            # todo -- what to do with these?
-            return
+        if listing.listing_type in (ListingType.TileLayer,
+                ListingType.Wms):
+            if (listing.listing_type == ListingType.TileLayer and not listing.tile_url) or \
+                (listing.listing_type == ListingType.Wms and not listing.server_url):
+                # listing does not have tile/server url, so we need to request it now
+                if self._current_listing_reply is not None and not sip.isdeleted(
+                        self._current_listing_reply):
+                    self._current_listing_reply.abort()
+                    self._current_listing_reply = None
 
-        if not listing.tile_url:
-            # listing does not have tile url, so we need to request it now
-            if self._current_listing_reply is not None and not sip.isdeleted(
-                    self._current_listing_reply):
-                self._current_listing_reply.abort()
-                self._current_listing_reply = None
+                request = API_CLIENT.request_listing(listing.id)
+                self._current_listing_reply = QgsNetworkAccessManager.instance().get(request)
+                self._current_listing_reply.finished.connect(
+                    partial(self._listing_reply_finished, self._current_listing_reply))
+                return
 
-            request = API_CLIENT.request_listing(listing.id)
-            self._current_listing_reply = QgsNetworkAccessManager.instance().get(request)
-            self._current_listing_reply.finished.connect(
-                partial(self._listing_reply_finished, self._current_listing_reply))
-            return
-
-        layer = listing.to_qgis_layer()
-        if layer:
-            QgsProject.instance().addMapLayer(layer)
+            layer = listing.to_qgis_layer()
+            if layer:
+                QgsProject.instance().addMapLayer(layer)
 
     def _listing_reply_finished(self, reply: QNetworkReply):
         """
