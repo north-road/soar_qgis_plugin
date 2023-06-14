@@ -426,7 +426,7 @@ class ListingQuery:
         self.user_id: Optional[str] = user_id
         # default to filtering to tile layers only
         self.listing_types: List[ListingType] = listing_types or \
-                                                [ListingType.TileLayer, ListingType.Wms]
+                                                [ListingType.TileLayer]
         self.order_by: Optional[OrderBy] = order_by
         self.aoi: Optional[QgsGeometry] = aoi
         self.keywords: Optional[str] = keywords
