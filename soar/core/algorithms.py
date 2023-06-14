@@ -281,7 +281,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
         settings.title = title
         settings.description = description
         settings.tags = tags
-        settings.category = category
+        settings.categories = [category]
         settings.output_file_name = temp_file
         upload_start_reply = API_CLIENT.request_upload_start(settings)
 

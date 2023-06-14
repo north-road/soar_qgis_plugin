@@ -38,21 +38,19 @@
          <string>Metadata</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_5">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
            <property name="text">
-            <string>Tags</string>
+            <string>Map title</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QLineEdit" name="tags_edit"/>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="map_title_edit"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPlainTextEdit" name="description_edit"/>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Categories</string>
+           </property>
+          </widget>
          </item>
          <item row="1" column="0">
           <widget class="QLabel" name="label_2">
@@ -64,22 +62,30 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Map title</string>
+            <string>Tags</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Category</string>
-           </property>
-          </widget>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="category_combo_2"/>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="map_title_edit"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPlainTextEdit" name="description_edit"/>
          </item>
          <item row="3" column="1">
           <widget class="QComboBox" name="category_combo"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="tags_edit"/>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="category_combo_3"/>
          </item>
         </layout>
        </widget>

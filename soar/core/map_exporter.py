@@ -50,7 +50,7 @@ class MapExportSettings:
         self.title: str = ''
         self.description: str = ''
         self.tags: List[str] = []
-        self.category: str = ''
+        self.categories: List[str] = []
         self.size: QSize = QSize()
         self.scale: float = 0
         self.extent: QgsRectangle = QgsRectangle()

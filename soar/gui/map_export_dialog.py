@@ -71,24 +71,38 @@ class MapExportDialog(base, ui):
         self.description_edit.setPlainText(self.project_manager.soar_map_description())
         self.tags_edit.setText(';'.join(self.project_manager.soar_map_tags()))
 
-        self.category_combo.addItem('')
-        self.category_combo.addItem(self.tr('Agriculture'), 'agriculture')
-        self.category_combo.addItem(self.tr('Climate'), 'climate')
-        self.category_combo.addItem(self.tr('Earth Art'), 'earth-art')
-        self.category_combo.addItem(self.tr('Economic'), 'economic')
-        self.category_combo.addItem(self.tr('Geology'), 'geology')
-        self.category_combo.addItem(self.tr('History'), 'history')
-        self.category_combo.addItem(self.tr('Marine'), 'marine')
-        self.category_combo.addItem(self.tr('Political'), 'political')
-        self.category_combo.addItem(self.tr('Terrain'), 'terrain')
-        self.category_combo.addItem(self.tr('Transport'), 'transport')
-        self.category_combo.addItem(self.tr('Urban'), 'urban')
+        category_index = 1
+        for combo in (self.category_combo,
+                      self.category_combo_2,
+                      self.category_combo_3):
+            combo.addItem('')
+            combo.addItem(self.tr('Agriculture'), 'agriculture')
+            combo.addItem(self.tr('Climate'), 'climate')
+            combo.addItem(self.tr('Earth Art'), 'earth-art')
+            combo.addItem(self.tr('Economic'), 'economic')
+            combo.addItem(self.tr('Geology'), 'geology')
+            combo.addItem(self.tr('History'), 'history')
+            combo.addItem(self.tr('Marine'), 'marine')
+            combo.addItem(self.tr('Political'), 'political')
+            combo.addItem(self.tr('Terrain'), 'terrain')
+            combo.addItem(self.tr('Transport'), 'transport')
+            combo.addItem(self.tr('Urban'), 'urban')
+            combo.currentIndexChanged.connect(self._category_combo_changed)
 
-        project_category = self.project_manager.soar_category()
-        if project_category:
-            self.category_combo.setCurrentIndex(self.category_combo.findData(project_category))
-        else:
-            self.category_combo.setCurrentIndex(0)
+            project_category = self.project_manager.soar_category(
+                category_index
+            )
+            print(project_category)
+            if project_category:
+                combo.setCurrentIndex(
+                    combo.findData(project_category)
+                )
+            else:
+                combo.setCurrentIndex(0)
+
+            category_index += 1
+
+        self._category_combo_changed()
 
         # some type hints:
         self.mExtentGroupBox: QgsExtentGroupBox
@@ -118,6 +132,30 @@ class MapExportDialog(base, ui):
         self.mLockAspectRatio.setLocked(True)
 
         self.update_output_size()
+
+    def _category_combo_changed(self):
+        """
+        Called when a category combo value is changed
+        """
+        category_1_exists = bool(self.category_combo.currentData())
+
+        if not category_1_exists and self.category_combo_2.currentData():
+            self.category_combo.setCurrentIndex(
+                self.category_combo_2.currentIndex())
+            self.category_combo_2.setCurrentIndex(0)
+            category_1_exists = True
+
+        category_2_exists = category_1_exists and \
+            bool(self.category_combo_2.currentData())
+
+        if not category_2_exists and self.category_combo_3.currentData():
+            self.category_combo_2.setCurrentIndex(
+                self.category_combo_3.currentIndex())
+            self.category_combo_3.setCurrentIndex(0)
+            category_2_exists = True
+
+        self.category_combo_2.setVisible(category_1_exists)
+        self.category_combo_3.setVisible(category_2_exists)
 
     def update_output_width(self):
         """
@@ -293,7 +331,11 @@ class MapExportDialog(base, ui):
         export_settings.title = self.map_title_edit.text()
         export_settings.description = self.description_edit.toPlainText()
         export_settings.tags = self.tags_edit.text().split(';')
-        export_settings.category = self.category_combo.currentData()
+        export_settings.categories = [cat for cat in (
+            self.category_combo.currentData(),
+            self.category_combo_2.currentData(),
+            self.category_combo_3.currentData(),
+        ) if cat]
         export_settings.size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
         export_settings.scale = self.mScaleWidget.scale()
         export_settings.extent = self.mExtentGroupBox.outputExtent()
@@ -309,7 +351,9 @@ class MapExportDialog(base, ui):
         self.project_manager.set_soar_map_title(export_settings.title)
         self.project_manager.set_soar_map_description(export_settings.description)
         self.project_manager.set_soar_map_tags(export_settings.tags)
-        self.project_manager.set_soar_category(export_settings.category)
+        for idx, category in enumerate(export_settings.categories):
+            self.project_manager.set_soar_category(category,
+                                                   idx + 1)
         self.project_manager.set_export_size(export_settings.size)
         self.project_manager.set_export_scale(export_settings.scale)
         self.project_manager.set_export_extent(export_settings.extent)

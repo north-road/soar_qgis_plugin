@@ -618,7 +618,7 @@ class ApiClient(QObject):
             'title': export_settings.title,
             'description': export_settings.description,
             'tags': export_settings.tags,
-            'categories': [export_settings.category],
+            'categories': export_settings.categories,
         }
 
         params = {

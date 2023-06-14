@@ -178,13 +178,19 @@ class ProjectManager(QObject):
         self.project.writeEntry('soar', 'map_tags', tags)
         self.project.setDirty(True)
 
-    def soar_category(self) -> Optional[str]:
+    def soar_category(self, index: int = 1) -> Optional[str]:
         """
         Returns the soar category for the map
         """
-        cat, _ = self.project.readEntry('soar', 'map_category')
+        cat, _ = self.project.readEntry('soar', 'map_category{}'.format(
+            str(index) if index > 1 else ''
+        )
+                                        )
         if cat:
             return cat
+
+        if index > 1:
+            return None
 
         project_metadata_cats = self.project.metadata().categories()
         # map from qgis (ISO) categories to soar
@@ -214,14 +220,16 @@ class ProjectManager(QObject):
 
         return None
 
-    def set_soar_category(self, category: str):
+    def set_soar_category(self, category: str, index: int = 1):
         """
         Sets the map category to use when exporting the project to soar.earth
         """
-        if category == self.soar_category():
+        if category == self.soar_category(index):
             return
 
-        self.project.writeEntry('soar', 'map_category', category)
+        self.project.writeEntry('soar', 'map_category{}'.format(
+            str(index) if index > 1 else ''
+        ), category)
         self.project.setDirty(True)
 
     def export_size(self) -> QSize:
