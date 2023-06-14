@@ -162,7 +162,7 @@ class ResponsiveTableLayout(QLayout):
         assigned_lines = []
         current_line_items = []
 
-        visible_items = [i for i in self.itemList if i.widget().isVisible()]
+        visible_items = [i for i in self.itemList if not i.widget().isHidden()]
 
         if not visible_items:
             return 0
