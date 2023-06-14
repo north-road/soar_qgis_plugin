@@ -14,12 +14,14 @@ __copyright__ = 'Copyright 2022, North Road'
 __revision__ = '$Format:%H$'
 
 from typing import Optional
+from functools import partial
 
 from qgis.PyQt import sip
 from qgis.PyQt.QtCore import (
     Qt,
     QCoreApplication,
-    QEvent
+    QEvent,
+    QTimer
 )
 from qgis.PyQt.QtWidgets import (
     QAction,
@@ -105,6 +107,7 @@ class SoarPlugin:
         self.provider = SoarEarthProvider()
 
         self.task = None
+        self._dock_show_timer: Optional[QTimer] = None
 
         # qgis plugin interface
 
@@ -153,7 +156,11 @@ class SoarPlugin:
         self.source_select_provider = SoarSourceSelectProvider()
         QgsGui.sourceSelectProviderRegistry().addProvider(self.source_select_provider)
 
-        self.dock.hide()
+        # have to delay dock display by a little amount
+        self._dock_show_timer = QTimer()
+        self._dock_show_timer.setSingleShot(True)
+        self._dock_show_timer.timeout.connect(partial(self.dock.setVisible, True))
+        self._dock_show_timer.start(100)
 
     def initProcessing(self):
         """Create the Processing provider"""
