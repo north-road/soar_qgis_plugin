@@ -52,6 +52,7 @@ class LoginManager(QObject):
 
     logged_in = pyqtSignal()
     login_failed = pyqtSignal()
+    status_changed = pyqtSignal(LoginStatus)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -113,6 +114,7 @@ class LoginManager(QObject):
         iface.messageBar().pushItem(self._logging_in_message)
 
         API_CLIENT.login(username, password)
+        self.status_changed.emit(self.status)
         return False
 
     def _cleanup_messages(self):
@@ -147,6 +149,7 @@ class LoginManager(QObject):
 
         self.queued_callbacks = []
         self.login_failed.emit()
+        self.status_changed.emit(self.status)
 
     def _login_success(self):
         """
@@ -163,6 +166,17 @@ class LoginManager(QObject):
             callback()
 
         self.logged_in.emit()
+        self.status_changed.emit(self.status)
+
+    def logout(self):
+        """
+        Logs out
+        """
+        self._cleanup_messages()
+
+        self.status = LoginStatus.LoggedOut
+        self.queued_callbacks = []
+        self.status_changed.emit(self.status)
 
 
 LOGIN_MANAGER = LoginManager()

@@ -52,7 +52,8 @@ from .gui import (
     ConfirmExportDialog
 )
 from .gui import (
-    LOGIN_MANAGER
+    LOGIN_MANAGER,
+    LoginStatus
 )
 from .gui.browser_dock_widget import BrowserDockWidget
 from .gui.data_source_widget import SoarDataSourceWidget
@@ -99,6 +100,7 @@ class SoarPlugin:
         self.browse_action: Optional[QAction] = None
         self.add_soar_layer_action: Optional[QAction] = None
         self.export_map_action: Optional[QAction] = None
+        self.logout_action: Optional[QAction] = None
 
         self.source_select_provider: Optional[SoarSourceSelectProvider] = None
         self.project_manager = ProjectManager(QgsProject.instance())
@@ -140,6 +142,14 @@ class SoarPlugin:
         self.export_map_action.triggered.connect(self.export_map_to_soar)
         self.iface.pluginToolBar().addAction(self.export_map_action)
 
+        self.logout_action = QAction(self.tr("Logout of Soar"),
+                                         self.iface.mainWindow())
+        self.logout_action.setIcon(GuiUtils.get_icon('soar_export.svg'))
+        self.logout_action.setToolTip(self.tr('Logs out of Soar'))
+        self.logout_action.triggered.connect(self._logout)
+        self.logout_action.setEnabled(False)
+        self.iface.pluginToolBar().addAction(self.logout_action)
+
         try:
             self.iface.addProjectExportAction(self.export_map_action)
         except AttributeError:
@@ -162,6 +172,8 @@ class SoarPlugin:
         self._dock_show_timer.timeout.connect(partial(self.dock.setVisible, True))
         self._dock_show_timer.start(100)
 
+        LOGIN_MANAGER.status_changed.connect(self._login_status_changed)
+
     def initProcessing(self):
         """Create the Processing provider"""
         QgsApplication.processingRegistry().addProvider(self.provider)
@@ -180,12 +192,16 @@ class SoarPlugin:
             self.dock.deleteLater()
         self.dock = None
 
-        for action in (self.browse_action, self.export_map_action, self.add_soar_layer_action):
+        for action in (self.browse_action,
+                       self.export_map_action,
+                       self.add_soar_layer_action,
+                       self.logout_action):
             if not sip.isdeleted(action):
                 action.deleteLater()
         self.browse_action = None
         self.export_map_action = None
         self.add_soar_layer_action = None
+        self.logout_action = None
 
         if self.source_select_provider and not sip.isdeleted(self.source_select_provider):
             QgsGui.sourceSelectProviderRegistry().removeProvider(self.source_select_provider)
@@ -209,6 +225,18 @@ class SoarPlugin:
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('Soar', message)
+
+    def _login_status_changed(self, status: LoginStatus):
+        """
+        Called when the login status is changed
+        """
+        self.logout_action.setEnabled(status == LoginStatus.LoggedIn)
+
+    def _logout(self):
+        """
+        Triggers a logout
+        """
+        LOGIN_MANAGER.logout()
 
     def export_map_to_soar(self):
         """
