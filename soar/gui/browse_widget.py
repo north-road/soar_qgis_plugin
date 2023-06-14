@@ -35,7 +35,8 @@ from qgis.core import (
     QgsCoordinateTransform,
     QgsGeometry,
     QgsCsException,
-    QgsRectangle
+    QgsRectangle,
+    QgsReferencedRectangle
 )
 from qgis.gui import (
     QgsFilterLineEdit,
@@ -220,6 +221,10 @@ class BrowseWidget(QWidget):
             layer = listing.to_qgis_layer()
             if layer:
                 QgsProject.instance().addMapLayer(layer)
+                iface.mapCanvas().setReferencedExtent(
+                    QgsReferencedRectangle(layer.extent(), layer.crs())
+                )
+
 
     def _listing_reply_finished(self, reply: QNetworkReply):
         """
