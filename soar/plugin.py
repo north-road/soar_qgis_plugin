@@ -144,7 +144,7 @@ class SoarPlugin:
 
         self.logout_action = QAction(self.tr("Logout of Soar"),
                                          self.iface.mainWindow())
-        self.logout_action.setIcon(GuiUtils.get_icon('soar_export.svg'))
+        self.logout_action.setIcon(GuiUtils.get_icon('soar_logout.svg'))
         self.logout_action.setToolTip(self.tr('Logs out of Soar'))
         self.logout_action.triggered.connect(self._logout)
         self.logout_action.setEnabled(False)
