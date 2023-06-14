@@ -225,7 +225,6 @@ class BrowseWidget(QWidget):
                     QgsReferencedRectangle(layer.extent(), layer.crs())
                 )
 
-
     def _listing_reply_finished(self, reply: QNetworkReply):
         """
         Called on receiving a reply from the listing api

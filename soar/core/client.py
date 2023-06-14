@@ -73,7 +73,7 @@ class ListingType(Enum):
                 }[string]
 
     @staticmethod
-    def to_string(listing: 'Listing') -> str:
+    def to_string(listing: 'ListingType') -> str:
         """
         Converts a listing value to string
         """
@@ -450,7 +450,7 @@ class ListingQuery:
             params['offset'] = self.offset
         if self.listing_types:
             params['listingType'] = ','.join(
-                [ListingType.to_string(l) for l in self.listing_types]
+                [ListingType.to_string(_type) for _type in self.listing_types]
             )
         if self.order_by:
             params['orderBy'] = OrderBy.to_string(self.order_by)

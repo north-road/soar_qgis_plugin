@@ -306,7 +306,6 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(request.url().toString(),
                          'https://api.soar.earth/v1/listings?keywords=flood&limit=50&offset=5&listingType=WMS,TILE_LAYER&orderBy=COMMENTS&category=categ&featured=feat')
 
-
         query = ListingQuery(aoi=QgsGeometry.fromWkt(
             'POLYGON ((15.813616 49.501767, 15.670471 49.501767, 15.670471 49.397561, 15.813616 49.397561, 15.813616 49.501767))]'))
         request = client.request_listings(query)
