@@ -34,7 +34,8 @@ from qgis.core import (
     QgsExpressionContextUtils,
     QgsMapRendererTask,
     QgsTask,
-    QgsMapSettingsUtils
+    QgsMapSettingsUtils,
+    QgsMapDecoration
 )
 from qgis.gui import (
     QgsMapCanvas
@@ -55,6 +56,8 @@ class MapExportSettings:
         self.scale: float = 0
         self.extent: QgsRectangle = QgsRectangle()
         self.output_file_name: Optional[str] = None
+        self.include_decorations = True
+        self.decorations: List[QgsMapDecoration] = []
 
     def map_settings(self, map_canvas: QgsMapCanvas) -> QgsMapSettings:
         """
@@ -115,7 +118,9 @@ class MapPublisher(QgsTask):
     success = pyqtSignal()
     failed = pyqtSignal(str)
 
-    def __init__(self, settings: MapExportSettings, canvas: QgsMapCanvas):
+    def __init__(self,
+                 settings: MapExportSettings,
+                 canvas: QgsMapCanvas):
         super().__init__('Publishing map to Soar', QgsTask.Flag.CanCancel)
 
         self.settings = settings
@@ -125,9 +130,12 @@ class MapPublisher(QgsTask):
         temp_path = Path(self.temp_dir.name)
         self.settings.output_file_name = (temp_path / 'qgis_map_export.tiff').as_posix()
 
+        render_task = QgsMapRendererTask(self.map_settings, self.settings.output_file_name,
+                               fileFormat='TIF')
+        if settings.decorations:
+            render_task.addDecorations(settings.decorations)
         self.addSubTask(
-            QgsMapRendererTask(self.map_settings, self.settings.output_file_name,
-                               fileFormat='TIF'),
+            render_task,
             subTaskDependency=QgsTask.ParentDependsOnSubTask
         )
 

@@ -278,6 +278,9 @@ class SoarPlugin:
             if not confirm_dialog.exec():
                 return
 
+            if settings.include_decorations:
+                settings.decorations = self.iface.activeDecorations()[:]
+
             self.task = MapPublisher(settings, self.iface.mapCanvas())
             self.task.success.connect(self._upload_success)
             self.task.failed.connect(self._upload_failed)

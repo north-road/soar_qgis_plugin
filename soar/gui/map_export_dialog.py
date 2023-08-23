@@ -30,6 +30,7 @@ from qgis.gui import (
     QgsSpinBox,
     QgsRatioLockButton
 )
+from qgis.utils import iface
 
 from .gui_utils import GuiUtils
 from ..core import (
@@ -54,6 +55,17 @@ class MapExportDialog(base, ui):
         self.setupUi(self)
 
         self.setWindowTitle(self.tr('Export Map to Soar'))
+
+        active_decorations = iface.activeDecorations()
+        decoration_strings = []
+        for decoration in active_decorations:
+            decoration_strings.append(decoration.displayName().lower())
+
+        self.draw_decorations_check.setText(
+            self.tr("Draw active decorations: {}").format(
+                ', '.join(decoration_strings) if decoration_strings else
+                self.tr("none")))
+        self.draw_decorations_check.setChecked(bool(active_decorations))
 
         self.map_canvas = map_canvas
         self.project_manager = project_manager
@@ -340,6 +352,8 @@ class MapExportDialog(base, ui):
         export_settings.size = QSize(self.mOutputWidthSpinBox.value(), self.mOutputHeightSpinBox.value())
         export_settings.scale = self.mScaleWidget.scale()
         export_settings.extent = self.mExtentGroupBox.outputExtent()
+        export_settings.include_decorations = (
+            self.draw_decorations_check.isChecked())
 
         return export_settings
 

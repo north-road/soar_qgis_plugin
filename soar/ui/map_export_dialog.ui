@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>761</width>
-    <height>467</height>
+    <height>531</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -235,6 +235,16 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="draw_decorations_check">
+        <property name="text">
+         <string>Draw active decorations</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QDialogButtonBox" name="buttonBox">
