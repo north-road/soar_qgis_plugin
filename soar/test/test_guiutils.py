@@ -42,15 +42,14 @@ class GuiUtilsTest(unittest.TestCase):
                       GuiUtils.get_icon_svg('soar_logo.svg'))
         self.assertFalse(GuiUtils.get_icon_svg('not_an_icon.svg'))
 
-    @unittest.skip('Pending ui files')
     def testGetUiFilePath(self):
         """
         Tests get_ui_file_path svg path
         """
         self.assertTrue(
-            GuiUtils.get_ui_file_path('test.ui'))
-        self.assertIn('test.ui',
-                      GuiUtils.get_ui_file_path('test.ui'))
+            GuiUtils.get_ui_file_path('map_export_dialog.ui'))
+        self.assertIn('map_export_dialog.ui',
+                      GuiUtils.get_ui_file_path('map_export_dialog.ui'))
         self.assertFalse(GuiUtils.get_ui_file_path('not_a_form.ui'))
 
 

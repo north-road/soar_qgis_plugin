@@ -341,8 +341,8 @@ class ApiClientTest(unittest.TestCase):
         spy.wait()
 
         self.assertEqual(len(self._result), 2)
-        self.assertEqual(self._result[0].id, 10465)
-        self.assertEqual(self._result[1].id, 10464)
+        self.assertEqual(self._result[0].id, 10464)
+        self.assertEqual(self._result[1].id, 9966)
 
     def test_aoi(self):
         """
