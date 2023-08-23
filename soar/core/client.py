@@ -204,7 +204,7 @@ class Listing:
             source_uri = source_uri.replace('}', '%7D')
 
             layer_uri = f"type=xyz&url={source_uri}"
-            if self.min_zoom is not None:
+            if self.min_zoom is not None and self.min_zoom < 18:
                 layer_uri += f'&zmin={self.min_zoom}'
 
             return layer_uri
