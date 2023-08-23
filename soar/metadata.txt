@@ -10,7 +10,7 @@
 name=Soar
 qgisMinimumVersion=3.22
 description=Integrates the soar.earth service with QGIS
-version=0.0.6
+version=0.0.7
 author=North Road
 email=nyall@north-road.com
 
@@ -23,7 +23,8 @@ repository=https://github.com/north-road/soar_qgis_plugin
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=0.0.6 Remove WMS results from searches
+changelog=0.0.7 Fix display of layers with large minimum zoom values
+    0.0.6 Remove WMS results from searches
     0.0.5 Numerous fixes
     0.0.4 Updated icons, wording tweaks
     0.0.3 Fix layer extent calculations
