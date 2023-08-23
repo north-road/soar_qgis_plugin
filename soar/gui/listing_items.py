@@ -160,6 +160,12 @@ class ListingItemWidget(ListingItemWidgetBase):
 
         self.setCursor(QCursor(Qt.PointingHandCursor))
 
+    def __del__(self):
+        if self.footprint is not None:
+            self.footprint.scene().removeItem(self.footprint)
+            del self.footprint
+            self.footprint = None
+
     # QWidget interface
     # pylint: disable=missing-function-docstring,unused-argument
     def mousePressEvent(self, event):
