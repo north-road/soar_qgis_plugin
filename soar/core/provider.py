@@ -48,4 +48,4 @@ class SoarEarthProvider(QgsProcessingProvider):
 
     def versionInfo(self):
         # pylint: disable=missing-docstring
-        return '0.0.8'
+        return '1.0.0'
