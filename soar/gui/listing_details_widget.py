@@ -121,7 +121,12 @@ class ListingDetailsWidget(QgsPanelWidget):
         """
         Sets the item thumbnail
         """
-        dpi_ratio = self.screen().devicePixelRatio()
+        try:
+            dpi_ratio = self.screen().devicePixelRatio()
+        except AttributeError:
+            # Requires Qt 5.14+
+            dpi_ratio = 1
+
         width = int(img.width() / dpi_ratio)
         height = int(img.height() / dpi_ratio)
 

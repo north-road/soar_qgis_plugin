@@ -190,7 +190,11 @@ class ListingItemWidget(ListingItemWidgetBase):
         """
         thumbnail = self.process_thumbnail(img)
 
-        dpi_ratio = self.screen().devicePixelRatio()
+        try:
+            dpi_ratio = self.screen().devicePixelRatio()
+        except AttributeError:
+            # requires Qt 5.14+
+            dpi_ratio = 1
         width = int(thumbnail.width() / dpi_ratio)
         height = int(thumbnail.height() / dpi_ratio)
 
@@ -205,7 +209,12 @@ class ListingItemWidget(ListingItemWidgetBase):
         size = QSize(self.THUMBNAIL_SIZE, self.THUMBNAIL_SIZE + 2)
 
         image_size = size
-        scale_factor = self.screen().devicePixelRatio()
+        try:
+            scale_factor = self.screen().devicePixelRatio()
+        except AttributeError:
+            # Requires qt 5.14+
+            scale_factor = 1
+
         if scale_factor > 1:
             image_size *= scale_factor
 
