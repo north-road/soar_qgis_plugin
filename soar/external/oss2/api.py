@@ -438,11 +438,6 @@ class Bucket(_Base):
     def sign_url(self, method, key, expires, headers=None, params=None, slash_safe=False):
         """生成签名URL。
 
-        常见的用法是生成加签的URL以供授信用户下载，如为log.jpg生成一个5分钟后过期的下载链接::
-
-            >>> bucket.sign_url('GET', 'log.jpg', 5 * 60)
-            r'http://your-bucket.oss-cn-hangzhou.aliyuncs.com/logo.jpg?OSSAccessKeyId=YourAccessKeyId\&Expires=1447178011&Signature=UJfeJgvcypWq6Q%2Bm3IJcSHbvSak%3D'
-
         :param method: HTTP方法，如'GET'、'PUT'、'DELETE'等
         :type method: str
         :param key: 文件名
