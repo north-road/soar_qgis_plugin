@@ -13,7 +13,7 @@ description=Import or export maps via the Soar platform
 version=1.0.2
 author=North Road
 email=nyall@north-road.com
-suportsQt6=True
+supportsQt6=True
 
 about=The Soar QGIS plugin allows users to collaborate in building the new atlas of the world by either uploading, or downloading maps via the Soar platform.
 
