@@ -224,7 +224,7 @@ class ListingItemWidget(ListingItemWidgetBase):
         painter = QPainter(target)
 
         painter.setRenderHint(QPainter.Antialiasing, True)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
 
         painter.setPen(Qt.NoPen)
