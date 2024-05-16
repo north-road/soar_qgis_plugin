@@ -337,7 +337,7 @@ class Listing:
         layer.setCustomProperty('_soar_layer_id', self.id)
         if self.tile_url_expiry_at:
             layer.setCustomProperty('_soar_layer_expiry',
-                                    self.tile_url_expiry_at.toString(Qt.ISODate))
+                                    self.tile_url_expiry_at.toString(Qt.DateFormat.ISODate))
 
         return layer
 
@@ -528,11 +528,11 @@ class ApiClient(QObject):
         reply = self.login_reply
         self.login_reply = None
 
-        if reply.error() == QNetworkReply.OperationCanceledError:
+        if reply.error() == QNetworkReply.NetworkError.OperationCanceledError:
             self.login_error_occurred.emit('Login canceled')
             return
 
-        if reply.error() != QNetworkReply.NoError:
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             reply_json = json.loads(reply.readAll().data().decode())
 
             error = reply_json.get('error')
@@ -590,10 +590,10 @@ class ApiClient(QObject):
         if sip.isdeleted(self):
             return []
 
-        if reply.error() == QNetworkReply.OperationCanceledError:
+        if reply.error() == QNetworkReply.NetworkError.OperationCanceledError:
             return []
 
-        if reply.error() != QNetworkReply.NoError:
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             self.error_occurred.emit(reply.errorString())
             return []
 
@@ -607,10 +607,10 @@ class ApiClient(QObject):
         if sip.isdeleted(self):
             return None
 
-        if reply.error() == QNetworkReply.OperationCanceledError:
+        if reply.error() == QNetworkReply.NetworkError.OperationCanceledError:
             return None
 
-        if reply.error() != QNetworkReply.NoError:
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             self.error_occurred.emit(reply.errorString())
             return None
 
@@ -665,10 +665,10 @@ class ApiClient(QObject):
         if not reply or sip.isdeleted(reply):
             return None, None
 
-        if reply.error() == QNetworkReply.OperationCanceledError:
+        if reply.error() == QNetworkReply.NetworkError.OperationCanceledError:
             return None, None
 
-        if reply.error() != QNetworkReply.NoError:
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             reply_json = json.loads(reply.readAll().data().decode())
 
             error = reply_json.get('error')

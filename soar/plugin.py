@@ -81,7 +81,7 @@ class SoarSourceSelectProvider(QgsSourceSelectProvider):
 
     def createDataSourceWidget(self,
                                parent=None,
-                               fl=Qt.Widget,
+                               fl=Qt.WindowType.Widget,
                                widgetMode=QgsProviderRegistry.WidgetMode.Embedded):
         return SoarDataSourceWidget()
 
@@ -119,7 +119,7 @@ class SoarPlugin:
         self.initProcessing()
 
         self.dock = BrowserDockWidget()
-        self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+        self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
 
         self.browse_action = QAction(self.tr("Show Soar Browser"), self.iface.mainWindow())
         self.browse_action.setIcon(GuiUtils.get_icon('listing_search.svg'))
@@ -207,7 +207,7 @@ class SoarPlugin:
             QgsGui.sourceSelectProviderRegistry().removeProvider(self.source_select_provider)
         self.source_select_provider = None
 
-        QCoreApplication.sendPostedEvents(None, QEvent.DeferredDelete)
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
 
     # pylint: enable=missing-function-docstring
 
@@ -256,7 +256,7 @@ class SoarPlugin:
         if not validator.validate():
             dialog = QgsMessageOutput.createMessageOutput()
             dialog.setTitle(self.tr('Export Map to Soar'))
-            dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageHtml)
+            dialog.setMessage(validator.error_message(), QgsMessageOutput.MessageType.MessageHtml)
             dialog.showMessage()
             return
 
@@ -308,7 +308,7 @@ class SoarPlugin:
 
         self.show_extended_message(self.tr('Map successful published'),
                                    self.tr('Map Published to Soar'),
-                                   extended_message, level=Qgis.Success,
+                                   extended_message, level=Qgis.MessageLevel.Success,
                                    button_text=self.tr("What's Next?"))
 
     def _upload_failed(self, error: str):
@@ -322,9 +322,9 @@ class SoarPlugin:
         self.show_extended_message(self.tr('Upload failed'),
                                    self.tr('Soar Upload Failed'),
                                    error_message,
-                                   level=Qgis.Critical)
+                                   level=Qgis.MessageLevel.Critical)
 
-    def show_extended_message(self, short_message, title, long_message, level=Qgis.Warning,
+    def show_extended_message(self, short_message, title, long_message, level=Qgis.MessageLevel.Warning,
                               button_text=None):
         """
         Shows a warning via the QGIS message bar
@@ -333,7 +333,7 @@ class SoarPlugin:
         def show_details(_):
             dialog = QgsMessageOutput.createMessageOutput()
             dialog.setTitle(title)
-            dialog.setMessage(long_message, QgsMessageOutput.MessageHtml)
+            dialog.setMessage(long_message, QgsMessageOutput.MessageType.MessageHtml)
             dialog.showMessage()
 
         message_widget = self.iface.messageBar().createMessage(self.tr('Soar'),

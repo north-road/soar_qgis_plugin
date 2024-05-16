@@ -19,8 +19,7 @@ from functools import partial
 
 from qgis.PyQt.QtCore import (
     Qt,
-    QDateTime
-)
+    QDateTime, QDate, QTime)
 from qgis.PyQt.QtTest import QSignalSpy
 from qgis.core import (
     QgsGeometry,
@@ -57,7 +56,7 @@ class ApiClientTest(unittest.TestCase):
 
         user = User.from_json(json)
         self.assertEqual(user.created_at.toUTC(),
-                         QDateTime(2019, 10, 22, 2, 12, 17, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2019, 10, 22), QTime(2, 12, 17, 0), Qt.TimeSpec(1)))
         self.assertEqual(user.avatar_url,
                          'https://avatar.soar.earth/4515f58126704ae4831ffa9d66c395d7wtm.png/preview')
         self.assertEqual(user.name, 'TheRealDazzler')
@@ -117,7 +116,7 @@ class ApiClientTest(unittest.TestCase):
                          'Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
         self.assertEqual(listing.created_at.toUTC(),
-                         QDateTime(2021, 9, 1, 3, 42, 51, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2021, 9, 1), QTime(3, 42, 51, 0), Qt.TimeSpec(1)))
         self.assertEqual(listing.total_comments, 1)
         self.assertEqual(listing.filename,
                          "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi dam_8ab6c81cd0d07457796a87da86a7ae38.tiff")
@@ -129,7 +128,7 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.geometry.asWkt(1),
                          'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
         self.assertEqual(listing.updated_at.toUTC(),
-                         QDateTime(2022, 11, 22, 21, 42, 36, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2022, 11, 22), QTime(21, 42, 36, 0), Qt.TimeSpec(1)))
 
     def test_listing_from_json_singular(self):
         """
@@ -225,7 +224,7 @@ class ApiClientTest(unittest.TestCase):
                          'Cyanobacteria Levels, Near flood-stage Yamchi Dam, Iran June 10, 2019')
         self.assertEqual(listing.tags, ['flood', 'emergency'])
         self.assertEqual(listing.created_at.toUTC(),
-                         QDateTime(2021, 9, 1, 3, 42, 43, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2021, 9, 1), QTime(3, 42, 43, 0), Qt.TimeSpec(1)))
         self.assertEqual(listing.total_comments, 1)
         self.assertEqual(listing.filename,
                          "browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif")
@@ -237,14 +236,14 @@ class ApiClientTest(unittest.TestCase):
         self.assertEqual(listing.geometry.asWkt(1),
                          'Polygon ((48.1 38.1, 48 38.1, 48 38, 48.1 38, 48.1 38.1))')
         self.assertEqual(listing.updated_at.toUTC(),
-                         QDateTime(2022, 10, 21, 3, 25, 42, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2022, 10, 21), QTime(3, 25, 42, 0), Qt.TimeSpec(1)))
 
         self.assertEqual(listing.tile_url,
                          'https://shared-tile.soar.earth/images/browser/prod/4515f58126704ae4831ffa9d66c395d7@soar/yamchi__8ab6c81cd0d07457796a87da86a7ae38.tif/tile?z={z}&x={x}&y={y}&access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJzeXN0ZW0iLCJ3a3QiOiJQT0xZR09OKCg0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wNzIxODMwNSw0OC4wMzY5OTY2OCAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wMzQyNTQ3OCw0OC4xMDIzNjk2MyAzOC4wNzIxODMwNSkpIiwiaXNzIjoiYXBpLnNvYXIuZWFydGgiLCJtaW5ab29tIjoxMCwiZXhwIjoxNjY5OTk2ODE3LCJpYXQiOjE2NjkyMTkyMTcsInVzZXJJZCI6InN5c3RlbSIsImp0aSI6IjIxOTY2OWQwNDYyZTQ0ZmQ5NzU3MDQ5YzVlM2I5MDEyIiwia2V5IjoiYnJvd3Nlci9wcm9kLzQ1MTVmNTgxMjY3MDRhZTQ4MzFmZmE5ZDY2YzM5NWQ3QHNvYXIveWFtY2hpX184YWI2YzgxY2QwZDA3NDU3Nzk2YTg3ZGE4NmE3YWUzOC50aWYiLCJzdGF0dXMiOiJPSyJ9.TxZ9Q6pxLCxufAWlmoTOFaMsLv3QepIDTbz3otA7SHq2hfjn4JKSBKRq1736RQoLMHXoGuRPV289AEpHRbbb9CGj77oUpFralbQckvBKzcsxqTfrT3oGv8Dl-U5zWIQ2iy6BNKE1zuFcX2imQAq-wco6dUHkr1HjpqOR1XCwLM0B9Pt90Sm2Mb7CL7jICLhOs1aSLwSn473_pfobWyd8PCZQr_1I4lSSuRGNb2KbZ67LeAbCYX2lpLuSUbIv4lqHwPipX75w4SAxtgSxjctEptrKsefMJpHpdd-zIeUyn3Hf0VHzOwjmIhQoNdo-16VTn2i6wDc2J9XZl0s3Glsyzw&dom=1')
         self.assertEqual(listing.file_size, 3894594)
         self.assertEqual(listing.domain_name, 'soar.earth')
         self.assertEqual(listing.tile_url_expiry_at.toUTC(),
-                         QDateTime(2022, 12, 2, 16, 0, 17, 0, Qt.TimeSpec(1)))
+                         QDateTime(QDate(2022, 12, 2), QTime(16, 0, 17, 0), Qt.TimeSpec(1)))
 
     def test_listing_to_layer(self):
         """

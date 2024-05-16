@@ -67,8 +67,8 @@ class ListingsBrowserWidget(QgsPanelWidget):
         self.setPanelTitle(self.tr('Listings'))
 
         self.scroll_area = QgsScrollArea()
-        self.scroll_area.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.setWidgetResizable(True)
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
@@ -81,7 +81,7 @@ class ListingsBrowserWidget(QgsPanelWidget):
         self.setLayout(layout)
 
         self.setObjectName('ListingsBrowserWidget')
-        self.scroll_area.setFrameShape(QFrame.NoFrame)
+        self.scroll_area.setFrameShape(QFrame.Shape.NoFrame)
         self.scroll_area.setStyleSheet("#qt_scrollarea_viewport{ background: transparent; }")
 
         self._current_query: Optional[ListingQuery] = None
@@ -149,7 +149,7 @@ class ListingsBrowserWidget(QgsPanelWidget):
         request = API_CLIENT.request_listings(query)
         self._current_reply = QgsNetworkAccessManager.instance().get(request)
         self._current_reply.finished.connect(partial(self._reply_finished, self._current_reply))
-        self.setCursor(Qt.WaitCursor)
+        self.setCursor(Qt.CursorShape.WaitCursor)
 
     def _reply_finished(self, reply: QNetworkReply):
         """
@@ -164,10 +164,10 @@ class ListingsBrowserWidget(QgsPanelWidget):
 
         self._current_reply = None
 
-        if reply.error() == QNetworkReply.OperationCanceledError:
+        if reply.error() == QNetworkReply.NetworkError.OperationCanceledError:
             return
 
-        if reply.error() != QNetworkReply.NoError:
+        if reply.error() != QNetworkReply.NetworkError.NoError:
             print('error occurred :(')
             return
 
@@ -181,7 +181,7 @@ class ListingsBrowserWidget(QgsPanelWidget):
         self._listings.extend(listings)
         self.visible_count_changed.emit(len(self._listings))
 
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         self.table_widget.remove_empty_widgets()
 
         finished = len(listings) < PAGE_SIZE

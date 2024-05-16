@@ -100,7 +100,7 @@ class LoginManager(QObject):
 
         from .credential_dialog import CredentialDialog  # pylint: disable=import-outside-toplevel
         dlg = CredentialDialog()
-        if not dlg.exec_():
+        if not dlg.exec():
             return False
 
         self.status = LoginStatus.LoggingIn

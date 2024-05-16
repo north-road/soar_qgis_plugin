@@ -64,12 +64,12 @@ class ResponsiveTableLayout(QLayout):
     def horizontalSpacing(self):
         if self.hspacing >= 0:
             return self.hspacing
-        return self.smart_spacing(QStyle.PM_LayoutHorizontalSpacing)
+        return self.smart_spacing(QStyle.PixelMetric.PM_LayoutHorizontalSpacing)
 
     def verticalSpacing(self):
         if self.vspacing >= 0:
             return self.vspacing
-        return self.smart_spacing(QStyle.PM_LayoutVerticalSpacing)
+        return self.smart_spacing(QStyle.PixelMetric.PM_LayoutVerticalSpacing)
 
     def count(self):
         return len(self.itemList)
@@ -228,7 +228,7 @@ class ResponsiveTableWidget(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.setLayout(ResponsiveTableLayout(parent=None, vspacing=self.VERTICAL_SPACING,
                                              hspacing=self.HORIZONTAL_SPACING))
 

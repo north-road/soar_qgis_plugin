@@ -274,7 +274,7 @@ class PublishRasterToSoar(QgsProcessingAlgorithm):
                                  context.transformContext(),
                                  writer_feedback)
 
-        if res != QgsRasterFileWriter.NoError:
+        if res != QgsRasterFileWriter.WriterError.NoError:
             raise QgsProcessingException(
                 'An error occurred: {}'.format('\n'.join(writer_feedback.errors())))
 

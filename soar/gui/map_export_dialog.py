@@ -238,7 +238,7 @@ class MapExportDialog(base, ui):
         """
         Updates the extent calculation
         """
-        if self.mExtentGroupBox.extentState() != QgsExtentGroupBox.UserExtent:
+        if self.mExtentGroupBox.extentState() != QgsExtentGroupBox.ExtentState.UserExtent:
             current_dpi = self.dpi
 
             ms = self.map_canvas.mapSettings()

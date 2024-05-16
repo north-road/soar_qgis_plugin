@@ -76,7 +76,7 @@ class ProjectManager(QObject):
             layer.setExtent(QgsRectangle(x_min, y_min, x_max, y_max))
 
         soar_layer_expiry = QDateTime.fromString(layer.customProperty('_soar_layer_expiry'),
-                                                 Qt.ISODate)
+                                                 Qt.DateFormat.ISODate)
         remaining_days = QDateTime.currentDateTime().daysTo(soar_layer_expiry)
 
         if remaining_days > 2:
@@ -110,7 +110,7 @@ class ProjectManager(QObject):
         layer.setExtent(old_extent)
 
         layer.setCustomProperty('_soar_layer_expiry',
-                                full_listing.tile_url_expiry_at.toString(Qt.ISODate))
+                                full_listing.tile_url_expiry_at.toString(Qt.DateFormat.ISODate))
 
     def soar_map_title(self) -> str:
         """
