@@ -56,7 +56,7 @@ class ThumbnailManager:
         Called when a thumbnail has been fetched
         """
         self.queued_replies.remove(reply)
-        if reply.error() == QNetworkReply.NoError:
+        if reply.error() == QNetworkReply.NetworkError.NoError:
             url = reply.url().toString()
             img = QImage()
             img.loadFromData(reply.readAll())

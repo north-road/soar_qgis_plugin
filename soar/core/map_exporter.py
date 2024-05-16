@@ -64,14 +64,14 @@ class MapExportSettings:
         Converts the settings to a QgsMapSettings object
         """
         ms = QgsMapSettings()
-        ms.setFlag(QgsMapSettings.Antialiasing, True)
+        ms.setFlag(QgsMapSettings.Flag.Antialiasing, True)
         try:
-            ms.setFlag(QgsMapSettings.HighQualityImageTransforms, True)
+            ms.setFlag(QgsMapSettings.Flag.HighQualityImageTransforms, True)
         except AttributeError:
             pass
-        ms.setFlag(QgsMapSettings.ForceVectorOutput, True)
-        ms.setFlag(QgsMapSettings.DrawEditingInfo, False)
-        ms.setFlag(QgsMapSettings.DrawSelection, False)
+        ms.setFlag(QgsMapSettings.Flag.ForceVectorOutput, True)
+        ms.setFlag(QgsMapSettings.Flag.DrawEditingInfo, False)
+        ms.setFlag(QgsMapSettings.Flag.DrawSelection, False)
         ms.setDestinationCrs(QgsCoordinateReferenceSystem('EPSG:3857'))
 
         ms.setExtent(self.extent)
@@ -136,7 +136,7 @@ class MapPublisher(QgsTask):
             render_task.addDecorations(settings.decorations)
         self.addSubTask(
             render_task,
-            subTaskDependency=QgsTask.ParentDependsOnSubTask
+            subTaskDependency=QgsTask.SubTaskDependency.ParentDependsOnSubTask
         )
 
         self.upload_start_reply: Optional[QNetworkReply] = None
@@ -192,6 +192,6 @@ class MapPublisher(QgsTask):
         dst_ds = gdal.Open(self.settings.output_file_name, gdal.GA_Update)
         dst_ds.SetGeoTransform([c, a, b, f, d, e])
         dst_ds.SetProjection(QgsCoordinateReferenceSystem('EPSG:3857').toWkt(
-            QgsCoordinateReferenceSystem.WKT_PREFERRED_GDAL))
+            QgsCoordinateReferenceSystem.WktVariant.WKT_PREFERRED_GDAL))
 
         del dst_ds

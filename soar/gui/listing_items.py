@@ -72,7 +72,7 @@ class ListingItemWidgetBase(QFrame):
                border-radius: {}px; background: white;
             }}""".format(self.THUMBNAIL_CORNER_RADIUS)
         )
-        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         self.setFixedHeight(self.CARD_HEIGHT)
         self.setMinimumWidth(self.CARD_HEIGHT * 3)
         layout = QVBoxLayout()
@@ -131,7 +131,7 @@ class ListingItemWidget(ListingItemWidgetBase):
 
         self.title_label = QLabel()
         self.title_label.setWordWrap(True)
-        self.title_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.title_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 
         if listing.preview_url:
             download_thumbnail(listing.preview_url, self)
@@ -151,14 +151,14 @@ class ListingItemWidget(ListingItemWidgetBase):
         self.setStyleSheet(base_style)
 
         if self.listing.geometry:
-            self.footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.PolygonGeometry)
+            self.footprint = QgsRubberBand(iface.mapCanvas(), QgsWkbTypes.GeometryType.PolygonGeometry)
             self.footprint.setWidth(2)
             self.footprint.setColor(QColor(255, 0, 0, 200))
             self.footprint.setFillColor(QColor(255, 0, 0, 40))
         else:
             self.footprint = None
 
-        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
     def __del__(self):
         if self.footprint is not None:
@@ -169,7 +169,7 @@ class ListingItemWidget(ListingItemWidgetBase):
     # QWidget interface
     # pylint: disable=missing-function-docstring,unused-argument
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.clicked.emit(self.listing)
         else:
             super().mousePressEvent(event)
@@ -218,16 +218,18 @@ class ListingItemWidget(ListingItemWidgetBase):
         if scale_factor > 1:
             image_size *= scale_factor
 
-        target = QImage(image_size, QImage.Format_ARGB32)
-        target.fill(Qt.transparent)
+        target = QImage(image_size, QImage.Format.Format_ARGB32)
+        target.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(target)
 
-        painter.setRenderHint(QPainter.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
 
-        painter.setPen(Qt.NoPen)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+
+        painter.setPen(Qt.PenStyle.NoPen)
         painter.setBrush(QBrush(QColor(255, 0, 0)))
 
         path = QPainterPath()
@@ -250,13 +252,13 @@ class ListingItemWidget(ListingItemWidgetBase):
                    )
 
         painter.drawPath(path)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
 
         if img is not None:
             resized = img.scaled(image_size.width(),
                                  image_size.height(),
-                                 Qt.KeepAspectRatioByExpanding,
-                                 Qt.SmoothTransformation)
+                                 Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                                 Qt.TransformationMode.SmoothTransformation)
             if resized.width() > image_size.width():
                 left = int((resized.width() - image_size.width()) / 2)
             else:
@@ -270,7 +272,7 @@ class ListingItemWidget(ListingItemWidgetBase):
             painter.drawImage(0, 0, cropped)
         else:
             painter.setBrush(QBrush(QColor('#cccccc')))
-            painter.setPen(Qt.NoPen)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.drawRect(0, 0, 600, 600)
         painter.end()
 
@@ -306,4 +308,4 @@ class ListingItemWidget(ListingItemWidgetBase):
         """
         Hides the listing's footprint
         """
-        self.footprint.reset(QgsWkbTypes.PolygonGeometry)
+        self.footprint.reset(QgsWkbTypes.GeometryType.PolygonGeometry)

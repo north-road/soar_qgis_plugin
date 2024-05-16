@@ -66,14 +66,14 @@ class ListingDetailsWidget(QgsPanelWidget):
 
         credit_label = QLabel()
         credit_label.setText(self.tr('By {}').format(f'<a href="{self.listing.user.permalink()}">{self.listing.user.name}</a>'))
-        credit_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        credit_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         credit_label.setOpenExternalLinks(True)
         credit_label.setWordWrap(True)
         layout.addWidget(credit_label)
 
         link_label = QLabel()
         link_label.setText(self.tr('View on {}soar.earth{}').format(f'<a href="{self.listing.permalink()}">', '</a>'))
-        link_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        link_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         link_label.setOpenExternalLinks(True)
         link_label.setWordWrap(True)
         layout.addWidget(link_label)
@@ -98,10 +98,10 @@ class ListingDetailsWidget(QgsPanelWidget):
             description_html = self.listing.description
 
         description_label = QLabel(description_html)
-        description_label.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        description_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         description_label.setOpenExternalLinks(True)
         description_label.setWordWrap(True)
-        description_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        description_label.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         layout.addWidget(description_label)
 
         layout.addSpacing(QFontMetrics(self.font()).height() * 2)
